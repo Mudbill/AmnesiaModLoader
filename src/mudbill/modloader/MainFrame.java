@@ -370,7 +370,10 @@ public class MainFrame extends JFrame {
 					if(Boolean.parseBoolean(settings.getProperty("UseSteam")) == true) {
 						try {
 							Runtime runTime = Runtime.getRuntime();
-							runTime.exec(steamDirectory + File.separator + CurrentOS.getSteamExe() + " -applaunch 57300 " + filePath);
+							String[] nullString = null;
+							File workingDir = new File(gameDirectory);
+							runTime.exec(steamDirectory + File.separator + CurrentOS.getSteamExe() + " -applaunch 57300 " + filePath, nullString, workingDir);
+							
 							System.out.println("Running command: " + steamDirectory + File.separator + CurrentOS.getSteamExe() + " -applaunch 57300 " + filePath);
 						} catch (IOException e) {
 							System.err.println("Could not find Steam.exe in directory: " + steamDirectory);
@@ -379,8 +382,11 @@ public class MainFrame extends JFrame {
 					}
 					else {
 						try {
-							Runtime runTime = Runtime.getRuntime();
-							runTime.exec(gameDirectory + File.separator + CurrentOS.getGameExe() + " " + filePath);
+							Runtime runTime = Runtime.getRuntime();							
+							String[] nullString = null;
+							File workingDir = new File(gameDirectory);
+							runTime.exec(gameDirectory + File.separator + CurrentOS.getGameExe() + " " + filePath, nullString, workingDir);
+
 							System.out.println("Running command: " + gameDirectory + File.separator + CurrentOS.getGameExe() + " " + filePath);
 						} catch (IOException e) {
 							System.err.println("Could not find Launcher.exe in directory: " + gameDirectory);
