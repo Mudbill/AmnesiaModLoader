@@ -109,11 +109,15 @@ public class MainFrame extends JFrame {
 		gameDirectory = dir;
 	}
 	
-	
+	/**
+	 * Searches through a directory and its sub-directories, then sets up a new mod list.
+	 * @param name = name of file to find.
+	 * @param file = directory to search.
+	 */
 	public void findFile(String name,File file)
     {
         list = file.listFiles();
-        if(list!=null)
+        if(list != null)
         for (File fil : list)
         {
             if (fil.isDirectory())
@@ -127,6 +131,10 @@ public class MainFrame extends JFrame {
         }
     }
 	
+	/**
+	 * Disregards old list and sets up a new one.
+	 * @param list = new list.
+	 */
 	public void setList(JList<Object> list)
 	{
 		scrollList = new JScrollPane();
@@ -136,6 +144,9 @@ public class MainFrame extends JFrame {
 		scrollList.setViewportView(list);
 	}
 	
+	/**
+	 * Searches specified directories and sub-directories for a file named "main_init.cfg"
+	 */
 	public void checkMods()
 	{
 		try {
@@ -149,8 +160,12 @@ public class MainFrame extends JFrame {
 		}
 	}
 
+	/**
+	 * Displays the selected mod's information on the right panel.
+	 */
 	public void displayModInfo()
 	{
+		//Default entries.
 		String title = "Untitled";
 		String author = "By Anonymous";
 		String desc = "No description.";
@@ -182,6 +197,9 @@ public class MainFrame extends JFrame {
 		modMaxCompat.setText(compatMax);
 	}
 	
+	/**
+	 * Main setup method for the components, design and triggers.
+	 */
 	public void setupFrame()
 	{
 		contentPane = new JPanelBackground("/resources/launcher_bg.jpg");
@@ -389,7 +407,7 @@ public class MainFrame extends JFrame {
 
 							System.out.println("Running command: " + gameDirectory + File.separator + CurrentOS.getGameExe() + " " + filePath);
 						} catch (IOException e) {
-							System.err.println("Could not find Launcher.exe in directory: " + gameDirectory);
+							System.err.println("Could not find Amnesia.exe in directory: " + gameDirectory);
 							JOptionPane.showMessageDialog(null, CurrentOS.getGameExe() + " was not found in directory:\n" + gameDirectory + "\n\nPlease check the preferences to make sure the folder is set correctly.", "Game file not found", JOptionPane.ERROR_MESSAGE);
 						}
 					}

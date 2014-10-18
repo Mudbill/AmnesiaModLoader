@@ -33,6 +33,9 @@ public class Refresh extends JDialog {
 
 	public Refresh() {}
 	
+	/**
+	 * Displays the refresh window.
+	 */
 	public void displayRefreshWindow()
 	{
 		setResizable(false);
@@ -71,7 +74,10 @@ public class Refresh extends JDialog {
 		getContentPane().setLayout(groupLayout);
 	}
 
-	
+	/**
+	 * Creates a new List object to create a new modlist in. 
+	 * @param scrollList = The JScrollPane to place this list inside.
+	 */
 	public void createNewList(JScrollPane scrollList)
 	{
 		List<Object> listData = new ArrayList<Object>();
@@ -104,11 +110,18 @@ public class Refresh extends JDialog {
 		scrollList.setViewportView(listMain);
 	}
 		
+	/**
+	 * Gets the index of the selection in the list.
+	 * @return getSelectedIndex.
+	 */
 	public static int getListIndex()
 	{
 		return listMain.getSelectedIndex();
 	}
 		
+	/**
+	 * Refreshes the mod list by updating the search directory and re-running the setup.
+	 */
 	public void refreshList()
 	{
 		if(main.getModDirectory() != "") {

@@ -11,6 +11,15 @@ import javax.swing.UIManager;
 
 class ImageListCellRenderer implements ListCellRenderer<Object>
 {
+	/**
+	 * Method to render a JList cell with both text and icon by making a list of JPanels.
+	 * @param jlist = The JList to enable for.
+	 * @param value = JPanel created (?).
+	 * @param cellIndex = Index of the list.
+	 * @param isSelected = Whether the cell is selected.
+	 * @param cellHasFocus = Whether the cell has focus.
+	 * @return Component of a JPanel.
+	 */
 	public Component getListCellRendererComponent(JList<?> jlist, Object value, int cellIndex, boolean isSelected, boolean cellHasFocus)
 	{
 		if (value instanceof JPanel) {

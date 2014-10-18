@@ -55,7 +55,11 @@ public class Start {
 							refresh.refreshList();
 						}
 					});
+				
 				} catch (FileNotFoundException e) {
+					
+					//If preferences file is not found, assumed first start. Will create a preferences window instead of main window.
+
 					System.out.println("Preferences file not found. First startup?");
 					Preferences prefs = new Preferences();
 					prefs.displayPrefWindow();

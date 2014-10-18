@@ -54,6 +54,9 @@ public class ModList extends JLabel {
 
 	public ModList() {}
 	
+	/**
+	 * Resets the lists by overwriting existing ones with a new, blank list.
+	 */
 	public void resetList()
 	{
 		modsFoundTotal = 0;
@@ -67,41 +70,74 @@ public class ModList extends JLabel {
 		infoMaxCompatibility = new ArrayList<String>();
 	}
 	
+	/**
+	 * Gets the default icon for a mod in the list.
+	 * @return defIcon
+	 */
 	public String getDefIcon()
 	{
 		return this.defIcon;
 	}
 	
+	/**
+	 * Gets the title of a mod.
+	 * @return modTitle
+	 */
 	public String getModTitle()
 	{
 		return ModList.modTitle;
 	}
 	
+	/**
+	 * Gets the list of mods.
+	 * @return listDataArr
+	 */
 	public List<Object> getMods()
 	{
 		return ModList.listDataArr;
 	}
 	
+	/**
+	 * Gets the icon of a mod.
+	 * @return modIcon
+	 */
 	public String getModIcon()
 	{
 		return ModList.modIcon;
 	}
 	
+	/**
+	 * Gets the author of a mod.
+	 * @return modAuthor
+	 */
 	public String getModAuthor()
 	{
 		return ModList.modAuthor;
 	}
 	
+	/**
+	 * Gets the description of a mod.
+	 * @return modDesc
+	 */
 	public String getModDesc()
 	{
 		return ModList.modDesc;
 	}
 	
+	/**
+	 * Gets the amount of mods found in total from previous search.
+	 * @return modsFoundTotal
+	 */
 	public int getModsFound()
 	{
 		return ModList.modsFoundTotal;
 	}
 	
+	/**
+	 * Searches through a directory and its sub-directories, then sets up a new mod list.
+	 * @param name = name of file to find.
+	 * @param file = directory to search.
+	 */
 	public void findFile(String name,File file)
     {
         list = file.listFiles();
@@ -119,6 +155,9 @@ public class ModList extends JLabel {
         }
     }
 	
+	/**
+	 * Adds the file path to a mod to the index list.
+	 */
 	private void addLaunchIndex()
 	{
 		String launchPath = filePath;
@@ -126,6 +165,9 @@ public class ModList extends JLabel {
 		System.out.println("Adding flag to list: " + filePath);
 	}
 	
+	/**
+	 * Adds all of a mod's information available to their respective lists.
+	 */
 	private void addModInfo()
 	{		
 		infoTitle.add(modTitle);
@@ -137,40 +179,77 @@ public class ModList extends JLabel {
 		System.out.println("Adding information to list.");
 	}
 	
+	/**
+	 * Gets the minimum compatibility value of a listed mod.
+	 * @param idx = Mod index to get from.
+	 * @return infoMinCompatibility
+	 */
 	public String getModMinCompatibility(int idx)
 	{
 		return infoMinCompatibility.get(idx);
 	}
 	
+	/**
+	 * Gets the maximum compatibility value of a listed mod.
+	 * @param idx = Mod index to get from.
+	 * @return infoMaxCompatibility
+	 */
 	public String getModMaxCompatibility(int idx)
 	{
 		return infoMaxCompatibility.get(idx);
 	}
 	
+	/**
+	 * Gets the title of a listed mod.
+	 * @param idx = Mod index to get from.
+	 * @return title
+	 */
 	public String getModTitle(int idx)
 	{
 		String title = infoTitle.get(idx);
 		return title;
 	}
 	
+	/**
+	 * Gets the author of a listed mod.
+	 * @param idx = Mod index to get from.
+	 * @return infoAuthor
+	 */
 	public String getModAuthor(int idx)
 	{
 		String author = infoAuthor.get(idx);
 		return author;
 	}
 	
+	/**
+	 * Gets the description of a listed mod.
+	 * @param idx = Mod index to get from.
+	 * @return infoDescription
+	 */
 	public String getModDesc(int idx)
 	{
 		String desc = infoDescription.get(idx);
 		return desc;
 	}
 	
+	/**
+	 * Gets the mod file path (launch parameter) of a listed mod.
+	 * @param idx = Mod index to get from.
+	 * @return infoMinCompatibility
+	 */
 	public String getLaunchIndex(int idx)
 	{
 		filePath = index.get(idx);
 		return filePath;
 	}
 
+	/**
+	 * Resizes an image to a specified width and height.
+	 * @param image = The BufferedImage image object.
+	 * @param width = The width to resize to.
+	 * @param height = The height to resize to.
+	 * @return resized image.
+	 */
 	public static BufferedImage resize(BufferedImage image, int width, int height) 
 	{
 	    BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
@@ -181,6 +260,11 @@ public class ModList extends JLabel {
 	    return bi;
 	}
 	
+	/**
+	 * Constructor for main functionality used. This is ran every time a "main_init.cfg" file is found and adds 
+	 * all the associated information to that mod's index value.
+	 * @param fil = The File object (path) of an already found mod file.
+	 */
 	public ModList(File fil) {
 		
 		System.out.println("Found game file: " + fil);
