@@ -69,6 +69,9 @@ public class Preferences extends JFrame {
 	
 	public Preferences() {}
 	
+	/**
+	 * Opens the Preferences window. 
+	 */
 	public void displayPrefWindow()
 	{		
 		if(isOpen == false) {
@@ -101,26 +104,13 @@ public class Preferences extends JFrame {
 		}
 	}
 	
+	/**
+	 * Opens a file chooser to browse the file system for a path.
+	 * @param title = Top bar text.
+	 * @param button = The button calling.
+	 */
 	private void fileChooser(String title, int button)
-	{
-//		try {
-//	        // Set System L&F
-//	        UIManager.setLookAndFeel(
-//	            UIManager.getSystemLookAndFeelClassName());
-//	    } 
-//	    catch (UnsupportedLookAndFeelException e) {
-//	       // handle exception
-//	    }
-//	    catch (ClassNotFoundException e) {
-//	       // handle exception
-//	    }
-//	    catch (InstantiationException e) {
-//	       // handle exception
-//	    }
-//	    catch (IllegalAccessException e) {
-//	       // handle exception
-//	    }
-		
+	{		
 		chooser = new JFileChooser(); 
 		chooser.setPreferredSize(new Dimension(550, 400));
 	    
@@ -167,6 +157,9 @@ public class Preferences extends JFrame {
 	    }
 	}
 	
+	/**
+	 * Creates the Preferences window design and layout.
+	 */
 	private void setupPrefs()
 	{
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);

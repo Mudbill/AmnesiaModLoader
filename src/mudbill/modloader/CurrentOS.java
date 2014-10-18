@@ -11,6 +11,9 @@ public class CurrentOS {
 	
 	private static String system;
 	
+	/**
+	 * Constructor that determines the system that this application is being ran from.
+	 */
 	public CurrentOS() 
 	{
 		if(system == null) {
@@ -30,13 +33,16 @@ public class CurrentOS {
 		}
 	}
 	
+	/**
+	 * Sets OS specific values. If ran from Windows, it will name the start file Amnesia.exe. If ran from OS X, it will name it Amnesia.app instead etc.
+	 */
 	public void setOSValues()
 	{
 		if(system == null) return;
 		
 		if(system == "Windows") {
 			steamExe = "Steam.exe";
-			gameExe = "Launcher.exe";
+			gameExe = "Amnesia.exe";
 			saveDir = System.getProperty("user.home") + File.separator + "Documents\\Amnesia\\ModLoader";
 			System.out.println("steamExe = " + steamExe + ", gameExe = " + gameExe + ", saveDir = " + saveDir);
 		}
@@ -54,16 +60,28 @@ public class CurrentOS {
 		}
 	}
 	
+	/**
+	 * Gets the OS name of the Steam executable.
+	 * @return steamExe
+	 */
 	public static String getSteamExe()
 	{
 		return steamExe;
 	}
-	
+
+	/**
+	 * Gets the OS name of the game executable.
+	 * @return gameExe
+	 */
 	public static String getGameExe()
 	{
 		return gameExe;
 	}
 	
+	/**
+	 * Gets the OS path for the preferences' save directory.
+	 * @return saveDir
+	 */
 	public static String getSaveDir()
 	{
 		return saveDir;
