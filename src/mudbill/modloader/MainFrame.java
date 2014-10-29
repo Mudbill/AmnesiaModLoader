@@ -9,8 +9,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
+//import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.GroupLayout;
@@ -38,6 +43,7 @@ public class MainFrame extends JFrame {
 	private static String gameDirectory = "";
 	private static String steamDirectory = "";
 
+	private static List<String> shadersList = new ArrayList<String>();
 	private static Preferences prefWindow;
 	private static ModList modList;
 	private static Refresh refresh = new Refresh();
@@ -52,6 +58,7 @@ public class MainFrame extends JFrame {
 	private static JLabel modAuthor;
 	private static JLabel modMinCompat;
 	private static JLabel modMaxCompat;
+	private static JLabel modShaders;
 	private static JTextArea modDesc;
 	private JPanelBackground contentPane;
 	private JPanelBackground panelInfo;
@@ -66,6 +73,7 @@ public class MainFrame extends JFrame {
 	private JButton buttonPref;
 	private JLabel labelMin;
 	private JLabel labelMax;
+	private JLabel labelShaders;
 	
 	public MainFrame() {}
 	
@@ -131,6 +139,122 @@ public class MainFrame extends JFrame {
         }
     }
 	
+	public List<String> getModShaders ( String fileName, File Directory)
+	{
+		return shadersList;
+	}
+	
+	public void findShaders(File whichDirectory)
+	{
+		
+		String shadersExt = "glsl";
+		String fileExt = "";
+		String fileName = "";
+		int i = 0;
+		
+		
+		File[] l = whichDirectory.listFiles();
+		
+		l=whichDirectory.listFiles();
+		if (l!=null)
+		{
+			for (File f : l)
+			{
+				if (f.isDirectory())
+				{
+					findShaders( f );
+				}
+				
+				if ( f.isFile() )
+				{
+					fileName = f.getName();
+
+					i = fileName.lastIndexOf('.');
+					fileExt = fileName.substring(i+1);
+
+					if ( fileExt.equals(shadersExt) )
+					{
+						shadersList.add( f.getAbsolutePath());						
+					}
+	
+				}
+			}
+		}
+	
+	}
+	
+	public void resetShaders ()
+	{
+		File fShadersDir = new File (gameDirectory,"core/shaders");	
+		File[] files;
+		files = fShadersDir.listFiles();
+		
+		File fElement = new File("");
+		
+	    for (File f : files)
+        {
+	    	
+	    	fElement = new File ( f.getAbsolutePath() + "_back");
+            if ( fElement.exists() )
+            {
+            	f.delete();
+            	fElement.renameTo( f );
+            }
+            
+        }
+	    
+		
+	}
+	
+	public void placeShaders ()
+	{
+		System.out.println("shaders found:" + shadersList.size());
+		
+		//No custom shaders, exit.
+		if (shadersList.isEmpty()) { return; }
+		
+		//Variables
+		String sShaderName = "";
+		String sElement = shadersList.get(0);
+		File fElement = new File (sElement);
+		
+		File fShadersDir = new File (gameDirectory,"core/shaders");
+		File fShaderName = new File("");
+		
+		//Find, rename, copy
+		for(int i=0; i<shadersList.size();i++)
+		{
+			sElement = shadersList.get(i);
+			fElement = new File (sElement);
+			sShaderName = fElement.getName();
+			fShaderName = new File ( fShadersDir, sShaderName );
+			
+				if ( fShaderName.exists() )
+				{
+					File fTempShader = new File ( fShaderName.getAbsolutePath() + "_back");
+				
+				try {
+					fShaderName.renameTo( fTempShader );
+
+					Files.copy ( fElement.toPath(), fShaderName.toPath(), StandardCopyOption.REPLACE_EXISTING);
+					
+				} catch (SecurityException fe) {
+					System.out.println("SecurityException " + fe);
+					fe.printStackTrace();
+				} catch (NullPointerException fa) {
+					System.out.println("NullPointerException " + fa);
+					fa.printStackTrace();
+				} catch (IOException e) {
+					System.out.println("IOException " + e);
+					e.printStackTrace();
+				}
+			}	
+		}			
+				
+
+	}
+	
+	
 	/**
 	 * Disregards old list and sets up a new one.
 	 * @param list = new list.
@@ -160,6 +284,8 @@ public class MainFrame extends JFrame {
 		}
 	}
 
+	
+	
 	/**
 	 * Displays the selected mod's information on the right panel.
 	 */
@@ -171,6 +297,8 @@ public class MainFrame extends JFrame {
 		String desc = "No description.";
 		String compatMin = "Undefined";
 		String compatMax = "Undefined";
+		String shaders = "Undefined";
+		
 		
 		try {
 			if(modDirectory != null || modDirectory != "") {
@@ -186,6 +314,8 @@ public class MainFrame extends JFrame {
 
 				if(compatMin == "0.0") compatMin = "Any";
 				if(compatMax == "0.0") compatMax = "Any";
+				
+				shaders = modList.getModHasCustomShaders(index);
 			}
 		} catch (Exception e) {
 			System.err.println("Failed displaying mod info.");
@@ -195,6 +325,8 @@ public class MainFrame extends JFrame {
 		modDesc.setText(desc);
 		modMinCompat.setText(compatMin);
 		modMaxCompat.setText(compatMax);
+		modShaders.setText(shaders);
+
 	}
 	
 	/**
@@ -202,11 +334,16 @@ public class MainFrame extends JFrame {
 	 */
 	public void setupFrame()
 	{
+		
+
+		
+		
 		contentPane = new JPanelBackground("/resources/launcher_bg.jpg");
 		contentPane.setBackground(Color.BLACK);
 		this.setContentPane(contentPane);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(700, 583);
+		//this.setSize(700, 583);
+		this.setSize(700, 800);
 		this.setTitle(appName);
 		ImageIcon icon = new ImageIcon(MainFrame.class.getResource("/resources/icon_application.png"));
 		this.setIconImage(icon.getImage());
@@ -291,6 +428,10 @@ public class MainFrame extends JFrame {
 		
 		refresh.createNewList(scrollList);
 		
+		modShaders = new JLabel("no");
+		modShaders.setForeground(Color.LIGHT_GRAY);
+		modShaders.setFont(new Font("Verdana", Font.PLAIN, 12));
+		
 		modTitle = new JLabel("Untitled");
 		modTitle.setForeground(Color.LIGHT_GRAY);
 		modTitle.setHorizontalAlignment(SwingConstants.CENTER);
@@ -304,6 +445,9 @@ public class MainFrame extends JFrame {
 		modMinCompat.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		modMinCompat.setForeground(Color.LIGHT_GRAY);
 		
+		modMaxCompat = new JLabel("Undefined");
+		modMaxCompat.setForeground(Color.LIGHT_GRAY);
+		
 		scrollPane = new JScrollPane();
 		
 		modDesc = new JTextArea("No description.");
@@ -315,6 +459,10 @@ public class MainFrame extends JFrame {
 		modDesc.setEditable(false);
 		modDesc.setBackground(Color.LIGHT_GRAY);
 		
+		labelShaders = new JLabel("Custom shaders:");
+		labelShaders.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		labelShaders.setForeground(Color.LIGHT_GRAY);
+		
 		labelMin = new JLabel("Minimum game version:");
 		labelMin.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		labelMin.setForeground(Color.LIGHT_GRAY);
@@ -322,38 +470,45 @@ public class MainFrame extends JFrame {
 		labelMax = new JLabel("Maximum game version:");
 		labelMax.setForeground(Color.LIGHT_GRAY);
 		
-		modMaxCompat = new JLabel("Undefined");
-		modMaxCompat.setForeground(Color.LIGHT_GRAY);
+
 		
 		//Setup layout
-		GroupLayout gl_panelInfo = new GroupLayout(panelInfo);
-		gl_panelInfo.setHorizontalGroup(
-			gl_panelInfo.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panelInfo.createSequentialGroup()
-					.addGroup(gl_panelInfo.createParallelGroup(Alignment.TRAILING)
-						.addGroup(Alignment.LEADING, gl_panelInfo.createSequentialGroup()
-							.addGap(3)
-							.addComponent(scrollPane))
-						.addGroup(Alignment.LEADING, gl_panelInfo.createSequentialGroup()
-							.addGap(12)
-							.addComponent(modAuthor, GroupLayout.PREFERRED_SIZE, 312, GroupLayout.PREFERRED_SIZE)
-							.addGap(0, 29, Short.MAX_VALUE))
-						.addGroup(Alignment.LEADING, gl_panelInfo.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(modTitle, GroupLayout.PREFERRED_SIZE, 318, GroupLayout.PREFERRED_SIZE))
+				GroupLayout gl_panelInfo = new GroupLayout(panelInfo);
+				gl_panelInfo.setHorizontalGroup(
+					gl_panelInfo.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_panelInfo.createSequentialGroup()
-							.addContainerGap()
-							.addGroup(gl_panelInfo.createParallelGroup(Alignment.LEADING)
-								.addGroup(Alignment.TRAILING, gl_panelInfo.createSequentialGroup()
-									.addComponent(labelMin)
-									.addPreferredGap(ComponentPlacement.RELATED, 129, Short.MAX_VALUE)
-									.addComponent(modMinCompat))
+							.addGroup(gl_panelInfo.createParallelGroup(Alignment.TRAILING)
+								.addGroup(Alignment.LEADING, gl_panelInfo.createSequentialGroup()
+									.addGap(3)
+									.addComponent(scrollPane))
+								.addGroup(Alignment.LEADING, gl_panelInfo.createSequentialGroup()
+									.addGap(12)
+									.addComponent(modAuthor, GroupLayout.PREFERRED_SIZE, 312, GroupLayout.PREFERRED_SIZE)
+									.addGap(0, 29, Short.MAX_VALUE))
+								.addGroup(Alignment.LEADING, gl_panelInfo.createSequentialGroup()
+									.addContainerGap()
+									.addComponent(modTitle, GroupLayout.PREFERRED_SIZE, 318, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_panelInfo.createSequentialGroup()
-									.addComponent(labelMax)
-									.addPreferredGap(ComponentPlacement.RELATED, 127, Short.MAX_VALUE)
-									.addComponent(modMaxCompat)))))
-					.addContainerGap())
-		);
+									.addContainerGap()
+									.addGroup(gl_panelInfo.createParallelGroup(Alignment.LEADING)
+										
+										.addGroup(Alignment.TRAILING, gl_panelInfo.createSequentialGroup()
+											.addComponent(labelShaders)
+											.addPreferredGap(ComponentPlacement.RELATED, 129, Short.MAX_VALUE)
+											.addComponent(modShaders))
+											
+										.addGroup(Alignment.TRAILING, gl_panelInfo.createSequentialGroup()
+											.addComponent(labelMin)
+											.addPreferredGap(ComponentPlacement.RELATED, 127, Short.MAX_VALUE)
+											.addComponent(modMinCompat))
+											
+										.addGroup(gl_panelInfo.createSequentialGroup()
+											.addComponent(labelMax)
+											.addPreferredGap(ComponentPlacement.RELATED, 125, Short.MAX_VALUE)
+											.addComponent(modMaxCompat)))))
+											
+							.addContainerGap())
+				);
 		gl_panelInfo.setVerticalGroup(
 			gl_panelInfo.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panelInfo.createSequentialGroup()
@@ -364,8 +519,12 @@ public class MainFrame extends JFrame {
 					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 157, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panelInfo.createParallelGroup(Alignment.LEADING)
-						.addComponent(modMinCompat)
-						.addComponent(labelMin))
+						.addComponent(modShaders)
+						.addComponent(labelShaders))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panelInfo.createParallelGroup(Alignment.LEADING)
+						.addComponent(labelMin)
+						.addComponent(modMinCompat))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panelInfo.createParallelGroup(Alignment.LEADING)
 						.addComponent(labelMax)
@@ -385,6 +544,16 @@ public class MainFrame extends JFrame {
 					input = new FileInputStream(Preferences.prefPath);
 					settings.load(input);
 					
+					//Shaders
+					File whichDirectory = new File(modList.getLaunchIndex(Refresh.getListIndex()));
+					whichDirectory = new File( whichDirectory.getParent()); //Twice, to up two levels.
+					whichDirectory = new File( whichDirectory.getParent()); //Config/main_init.cfg
+					findShaders( whichDirectory);					
+					resetShaders();
+					placeShaders();
+					
+					
+					//Runs the game depending OS
 					if(Boolean.parseBoolean(settings.getProperty("UseSteam")) == true) {
 						try {
 							Runtime runTime = Runtime.getRuntime();
@@ -426,6 +595,11 @@ public class MainFrame extends JFrame {
 		buttonQuit = new JButton("Quit");
 		buttonQuit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
+				
+				//Reset shaders on exit
+				resetShaders();
+				
+				
 				System.out.println("Exiting application.");
 				System.exit(EXIT_ON_CLOSE);
 			}

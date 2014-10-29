@@ -34,6 +34,7 @@ public class ModList extends JLabel {
 	private static String modDesc;
 	private static String modMinCompat;
 	private static String modMaxCompat;
+	private static String modHasCustomShaders;
 	
 	private static List<Object> listDataArr = new ArrayList<Object>();
 	private static List<String> index = new ArrayList<String>();
@@ -43,6 +44,7 @@ public class ModList extends JLabel {
 	private static List<String> infoMinCompatibility = new ArrayList<String>();
 	private static List<String> infoMaxCompatibility = new ArrayList<String>();
 	private static String filePath;
+	private static List<String> infoCustomShaders = new ArrayList<String>();
 	
 	private Properties cfg = new Properties();
 	private Properties mainInit = new Properties();
@@ -68,6 +70,7 @@ public class ModList extends JLabel {
 		infoDescription = new ArrayList<String>();
 		infoMinCompatibility = new ArrayList<String>();
 		infoMaxCompatibility = new ArrayList<String>();
+		infoCustomShaders = new ArrayList<String>();
 	}
 	
 	/**
@@ -124,6 +127,11 @@ public class ModList extends JLabel {
 		return ModList.modDesc;
 	}
 	
+	public String getModHasShaders()
+	{
+		return ModList.modHasCustomShaders;
+	}
+	
 	/**
 	 * Gets the amount of mods found in total from previous search.
 	 * @return modsFoundTotal
@@ -175,7 +183,8 @@ public class ModList extends JLabel {
 		infoDescription.add(modDesc);
 		infoMinCompatibility.add(modMinCompat);
 		infoMaxCompatibility.add(modMaxCompat);
-
+		infoCustomShaders.add(modHasCustomShaders);
+		
 		System.out.println("Adding information to list.");
 	}
 	
@@ -232,6 +241,12 @@ public class ModList extends JLabel {
 		return desc;
 	}
 	
+	public String getModHasCustomShaders(int idx)
+	{
+		String customShaders = infoCustomShaders.get(idx);
+		return customShaders;
+	}
+	
 	/**
 	 * Gets the mod file path (launch parameter) of a listed mod.
 	 * @param idx = Mod index to get from.
@@ -277,6 +292,7 @@ public class ModList extends JLabel {
 		modDesc = "No description.";
 		modMinCompat = "Undefined";
 		modMaxCompat = "Undefined";
+		modHasCustomShaders = "Undefined";
 		
 		modPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		modLabel = new JLabel(this.getModTitle());
@@ -311,7 +327,8 @@ public class ModList extends JLabel {
 				modIcon = cfg.getProperty("IconFile"); System.out.println("\t\tIconFile \t= " + modIcon); 
 				modDesc = cfg.getProperty("Description"); System.out.println("\t\tDescription \t= " + modDesc); 
 				modMinCompat = cfg.getProperty("MinVersion"); System.out.println("\t\tMinVersion \t= " + modMinCompat);
-				modMaxCompat = cfg.getProperty("MaxVersion"); System.out.println("\t\tMaxVersion \t= " + modMaxCompat);
+				modMaxCompat = cfg.getProperty("MaxVersion"); System.out.println("\t\tMaxVersion \t= " + modMaxCompat);				
+				modHasCustomShaders = cfg.getProperty("CustomShaders"); System.out.println("\t\tCustomShaders \t\t= " + modHasCustomShaders); 
 			}
 
 			this.addModInfo();
