@@ -51,15 +51,12 @@ public class RefreshDialog extends Dialog {
 	 */
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle());
+		shell.setImage(SWTResourceManager.getImage(RefreshDialog.class, "/resources/icon_refresh.png"));
 		shell.setSize(314, 180);
 		shell.setText("Refresh");
 		
-		Label labelIcon = new Label(shell, SWT.NONE);
-		labelIcon.setImage(SWTResourceManager.getImage(RefreshDialog.class, "/resources/icon_refresh.png"));
-		labelIcon.setBounds(10, 10, 16, 16);
-		
 		Label labelRefresh = new Label(shell, SWT.NONE);
-		labelRefresh.setBounds(32, 10, 266, 15);
+		labelRefresh.setBounds(10, 10, 288, 15);
 		labelRefresh.setText("Updating list");
 		
 		Label labelModDir = new Label(shell, SWT.NONE);

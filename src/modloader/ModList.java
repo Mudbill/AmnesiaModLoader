@@ -306,12 +306,11 @@ public class ModList {
 			
 			if(cfgFound) {
 				cfg.load(inputCFG);
-				if(cfg.getProperty("Author") != null) modAuthor = cfg.getProperty("Author"); Log.info("\t\tAuthor \t\t= " + modAuthor);
-				if(cfg.getProperty("IconFile") != null) modIcon = cfg.getProperty("IconFile"); Log.info("\t\tIconFile \t= " + modIcon);
-				if(cfg.getProperty("Description") != null) modDesc = cfg.getProperty("Description"); Log.info("\t\tDescription \t= " + modDesc);
+				if(cfg.getProperty("Author") != null) modAuthor = cfg.getProperty("Author"); 
+				if(cfg.getProperty("IconFile") != null) modIcon = cfg.getProperty("IconFile"); 
+				if(cfg.getProperty("Description") != null) modDesc = cfg.getProperty("Description");
 				try {
 					if(cfg.getProperty("MinVersion") != null) modMinVer = ""+Float.parseFloat(cfg.getProperty("MinVersion")); 
-					Log.info("\t\tMinVersion \t= " + modMinVer);
 				} catch (NumberFormatException e) {
 					Log.warn("\t\tCould not parse float from MinVersion");
 				}
@@ -320,11 +319,15 @@ public class ModList {
 						String s = ""+Boolean.parseBoolean(cfg.getProperty("CustomShaders"));
 						if(s.equals("true")) modShader = "Yes";
 						else if(s.equals("false")) modShader = "No";
-						Log.info("\t\tCustomShaders \t= " + modShader);
 					}
 				} catch (Exception e) {
 					Log.warn("\t\tCould not parse boolean from CustomShaders");
 				}
+				Log.info("\t\tAuthor \t\t= " + modAuthor);
+				Log.info("\t\tDescription \t= " + modDesc);
+				Log.info("\t\tIconFile \t= " + modIcon);
+				Log.info("\t\tMinVersion \t= " + modMinVer);
+				Log.info("\t\tCustomShaders \t= " + modShader);
 			}
 			
 			this.addModInfo();

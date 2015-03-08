@@ -23,15 +23,12 @@ public class CurrentOS {
 			String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 			if((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
 				system = "MacOS";
-				Log.info("System = Mac OS X.");
 			}
 			else if(os.indexOf("win") >= 0) {
 				system = "Windows";
-				Log.info("System = Windows.");
 			}
 			else if(os.indexOf("nux") >= 0) {
 				system = "Linux";
-				Log.info("System = Linux.");
 			}
 		}
 	}
@@ -47,25 +44,22 @@ public class CurrentOS {
 			gameExe = "Amnesia.exe";
 			launcherExe = "Launcher.exe";
 			saveDir = System.getProperty("user.home") + File.separator + "My Documents\\Amnesia\\ModLoader";
-			defDir = System.getProperty("user.dir");
-			Log.info("Preference directory = " + saveDir);
 		}
 		else if(system == "MacOS") {
 			gameExe = "Amnesia.app";
 			launcherExe = "Launcher.app";
-			saveDir = System.getProperty("user.home") + File.separator + "Amnesia/ModLoader";
-			defDir = "~/Library";
-			Log.info("gameExe = " + gameExe + ", launcherExe = " + launcherExe + ", saveDir = " + saveDir);
+			saveDir = System.getProperty("user.home") + File.separator + "Library/Application Support/Frictional Games/Amnesia/ModLoader";
 		}
 		else if(system == "Linux") {
 			gameExe = "Amnesia.what?";
 			launcherExe = "Launcher.what?";
 			saveDir = System.getProperty("user.home") + File.separator + "Amnesia/ModLoader";
-			defDir = "/home";
-			Log.info("gameExe = " + gameExe + ", launcherExe = " + launcherExe + ", saveDir = " + saveDir);
 		}
+
+		defDir = System.getProperty("user.dir");
 		config = "modloader_settings.cfg";
 		log = "modloader_log.log";
+		Log.info("\tSystem = " + system + ", preference directory = " + saveDir);
 	}
 	
 	/**

@@ -73,7 +73,7 @@ public class Refresh {
 				}
 								
 				try {
-					this.setupNewList();
+					setupNewList();
 				} catch (Exception e) {
 					Log.error("Failed setupNewList()");
 					e.printStackTrace();

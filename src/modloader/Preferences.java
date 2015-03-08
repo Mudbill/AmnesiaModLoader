@@ -37,7 +37,7 @@ public class Preferences extends Dialog {
 	private TabItem tabGeneral, tabAbout;
 	private Composite panelGeneral, panelAbout;
 	private Label labelGameDir, labelModDir, labelName, labelVer, labelAuthor;
-	private Button buttonBrowseGame, radioUseSame, radioUseCustom, buttonBrowseMod, buttonCancel, buttonOK, buttonRefreshBoot, buttonForum, radioLauncher, radioGame, buttonMinimize;
+	private Button buttonBrowseGame, radioUseSame, radioUseCustom, buttonBrowseMod, buttonCancel, buttonOK, buttonRefreshBoot, buttonForum, radioLauncher, radioGame, buttonMinimize, buttonApplyShader;
 	private Group groupMisc, groupDir, groupIcon;
 	private Label iconPreview, labelSize;
 	private Scale slider;
@@ -74,7 +74,8 @@ public class Preferences extends Dialog {
 	 */
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle());
-		shell.setSize(560, 460);
+		shell.setImage(SWTResourceManager.getImage(Preferences.class, "/resources/icon_preferences.png"));
+		shell.setSize(560, 480);
 		shell.setText("Preferences");
 		shell.setLayout(new FormLayout());
 		
@@ -111,6 +112,7 @@ public class Preferences extends Dialog {
 		textAbout.setText("Thanks for using this application. More information as well as updates can be found on the official thread over at the Frictional Games forum. Click the button below to open the page.\r\n\r\n--- How to use ---\r\n\r\nWhen you open the program for the first time, you will be presented with the preferences. \r\nUse the Game Directory browser to find your game location. You can also specify a mod directory and a few other settings as you like. \r\n\r\nThe default game directory depends on whether you have a Steam copy or a retail copy.\r\n\r\n\tSteam:\r\n32-bit\tC:\\Program Files\\Steam\\SteamApps\\common\\Amnesia The Dark Descent\r\n64-bit\tC:\\Program Files (x86)\\Steam\\SteamApps\\common\\Amnesia The Dark Descent\r\n\r\n\tRetail:\r\n32-bit\tC:\\Program Files\\Amnesia The Dark Descent\\redist\r\n64-bit\tC:\\Program Files (x86)\\Amnesia The Dark Descent\\redist\r\n\r\nOnce you accept the preferences, your settings will be saved in your Amnesia save directory/ModLoader. \r\n\r\nThe main window will open, and will open first the next time you start it. \r\nIf the list is empty, click Refresh in the top left corner to update the list depending on your mod directory. This might take some time depending on the size of your folder and the speed of your computer.\r\n\r\nWhen the list of mods is available, you may select any you wish to play and click Launch Mod at the bottom. Alternatively, you can hit the arrow on the button to specify whether you want to start the launcher or the game directly. \r\n\r\nAfter selecting a mod, some information will be displayed on the right side. This includes the name of the mod, as well as extra information if available. A mod creator can add a modloader.cfg file to their /config folder to specify entries to display. These include author, description, minimum version and custom shaders. It can also contain a custom icon which will show up in the list to the left. \r\n\r\n--- For creators ---\r\n\r\nIf you want to fully support this modloader (which I'd be very happy about) you can add an extra config file to your mod's /config folder. Make a file and name it modloader.cfg, then add these lines and specify them to your liking:\r\n_______\r\n\r\nAuthor = Your Name\r\nIconFile = icon.png\r\nDescription = Your description.\r\nCustomShaders = false\r\nMinVersion = 1.2\r\n_______\r\n\r\nIf you want a custom icon as well, add it next to your modloader.cfg file (also in /config). The suggested resolution is 64x64. \r\n\r\n--- Credits\r\n\r\nMudbill (ME :D)\t- Primary development.\r\nAmn/Daemian\t- Extra development and custom shader support.\r\n\r\nTraggey\t\t- Background and icon artwork.\r\n\r\nMrBehemoth\t- Initial beta testing.\r\nKreekakon\t\t- Beta testing.\r\nLazzer\t\t\t- Beta testing.\r\n\r\n---\r\n\r\nPlease be on the lookout for issues and report them to me so I can try fixing them. Suggestions for features are also nice.");
 		
 		buttonForum = new Button(panelAbout, SWT.NONE);
+		buttonForum.setImage(SWTResourceManager.getImage(Preferences.class, "/resources/icon_web.png"));
 		buttonForum.setToolTipText(url);
 		buttonForum.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		buttonForum.setText("Open forum post");
@@ -174,6 +176,10 @@ public class Preferences extends Dialog {
 					if(buttonMinimize.getSelection()) {
 						p.setProperty("Minimize", "true");
 					} else p.setProperty("Minimize", "false");
+					
+					if(buttonApplyShader.getSelection()) {
+						p.setProperty("ApplyShaders", "true");
+					} else p.setProperty("ApplyShaders", "false");
 
 					p.setProperty("IconSize", ""+slider.getSelection());
 					p.setProperty("ModDir", modDir);
@@ -206,6 +212,7 @@ public class Preferences extends Dialog {
 		textGameDir.setToolTipText("Your game redist installation directory.");
 
 		buttonBrowseGame = new Button(groupDir, SWT.NONE);
+		buttonBrowseGame.setImage(SWTResourceManager.getImage(Preferences.class, "/resources/icon_folder.png"));
 		buttonBrowseGame.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		buttonBrowseGame.setText("Browse");
 		
@@ -219,6 +226,7 @@ public class Preferences extends Dialog {
 		radioUseCustom.setText("Use custom:");
 
 		buttonBrowseMod = new Button(groupDir, SWT.NONE);
+		buttonBrowseMod.setImage(SWTResourceManager.getImage(Preferences.class, "/resources/icon_folder.png"));
 		buttonBrowseMod.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		buttonBrowseMod.setEnabled(false);
 		buttonBrowseMod.setText("Browse");
@@ -271,17 +279,12 @@ public class Preferences extends Dialog {
 
 		groupMisc = new Group(panelGeneral, SWT.NONE);
 		groupMisc.setText("Miscellaneous");
-		groupMisc.setLayout(new FormLayout());
+		groupMisc.setLayout(null);
 		
 		buttonRefreshBoot = new Button(groupMisc, SWT.CHECK);
+		buttonRefreshBoot.setBounds(13, 24, 134, 16);
 		buttonRefreshBoot.setSelection(true);
 		buttonRefreshBoot.setText("Update list on startup");
-		buttonRefreshBoot.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				
-			}
-		});
 
 		groupIcon = new Group(panelGeneral, SWT.NONE);
 		groupIcon.setText("Icon size");
@@ -328,19 +331,20 @@ public class Preferences extends Dialog {
 		});
 		
 		labelPrimary = new Label(groupMisc, SWT.NONE);
+		labelPrimary.setBounds(13, 90, 121, 15);
 		labelPrimary.setText("Primary launch option:");
 		radioLauncher = new Button(groupMisc, SWT.RADIO);
+		radioLauncher.setBounds(23, 111, 70, 16);
 		radioLauncher.setText("Launcher");
 		radioGame = new Button(groupMisc, SWT.RADIO);
+		radioGame.setBounds(23, 133, 85, 16);
 		radioGame.setText("Direct game");
 		buttonMinimize = new Button(groupMisc, SWT.CHECK);
+		buttonMinimize.setBounds(13, 46, 202, 16);
 		buttonMinimize.setText("Minimize Modloader on mod start");
-
-		//GUI Design
-		FormData fd_buttonRefreshBoot = new FormData();
-		fd_buttonRefreshBoot.top = new FormAttachment(0, 9);
-		fd_buttonRefreshBoot.left = new FormAttachment(0, 10);
-		buttonRefreshBoot.setLayoutData(fd_buttonRefreshBoot);
+		buttonApplyShader = new Button(groupMisc, SWT.CHECK);
+		buttonApplyShader.setBounds(13, 68, 335, 16);
+		buttonApplyShader.setText("Apply custom shaders upon launch (if available)");
 		FormData fd_labelVer = new FormData();
 		fd_labelVer.top = new FormAttachment(labelName, 6);
 		fd_labelVer.right = new FormAttachment(labelName, -10, SWT.RIGHT);
@@ -385,6 +389,7 @@ public class Preferences extends Dialog {
 		fd_textGameDir.left = new FormAttachment(0, 10);
 		textGameDir.setLayoutData(fd_textGameDir);
 		FormData fd_buttonBrowseGame = new FormData();
+		fd_buttonBrowseGame.bottom = new FormAttachment(0, 54);
 		fd_buttonBrowseGame.left = new FormAttachment(0, 416);
 		fd_buttonBrowseGame.right = new FormAttachment(0, 490);
 		fd_buttonBrowseGame.top = new FormAttachment(0, 30);
@@ -406,14 +411,14 @@ public class Preferences extends Dialog {
 		FormData fd_buttonBrowseMod = new FormData();
 		fd_buttonBrowseMod.top = new FormAttachment(0, 122);
 		fd_buttonBrowseMod.left = new FormAttachment(0, 416);
-		fd_buttonBrowseMod.bottom = new FormAttachment(0, 145);
+		fd_buttonBrowseMod.bottom = new FormAttachment(0, 146);
 		fd_buttonBrowseMod.right = new FormAttachment(0, 490);
 		buttonBrowseMod.setLayoutData(fd_buttonBrowseMod);
 		FormData fd_textModDir = new FormData();
+		fd_textModDir.right = new FormAttachment(buttonBrowseMod, -13);
+		fd_textModDir.left = new FormAttachment(0, 10);
 		fd_textModDir.top = new FormAttachment(radioUseCustom, 6);
-		fd_textModDir.left = new FormAttachment(labelGameDir, 0, SWT.LEFT);
 		fd_textModDir.bottom = new FormAttachment(0, 146);
-		fd_textModDir.right = new FormAttachment(0, 403);
 		textModDir.setLayoutData(fd_textModDir);
 		FormData fd_groupMisc = new FormData();
 		fd_groupMisc.left = new FormAttachment(0, 10);
@@ -421,22 +426,6 @@ public class Preferences extends Dialog {
 		fd_groupMisc.top = new FormAttachment(groupDir, 6);
 		fd_groupMisc.bottom = new FormAttachment(100, -10);
 		groupMisc.setLayoutData(fd_groupMisc);
-		FormData fd_labelPrimary = new FormData();
-		fd_labelPrimary.left = new FormAttachment(buttonRefreshBoot, 0, SWT.LEFT);
-		fd_labelPrimary.top = new FormAttachment(buttonMinimize, 6);
-		labelPrimary.setLayoutData(fd_labelPrimary);
-		FormData fd_radioLauncher = new FormData();
-		fd_radioLauncher.top = new FormAttachment(labelPrimary, 6);
-		fd_radioLauncher.left = new FormAttachment(labelPrimary, 10, SWT.LEFT);
-		radioLauncher.setLayoutData(fd_radioLauncher);
-		FormData fd_radioGame = new FormData();
-		fd_radioGame.top = new FormAttachment(radioLauncher, 6);
-		fd_radioGame.left = new FormAttachment(0, 20);
-		radioGame.setLayoutData(fd_radioGame);
-		FormData fd_buttonMinimize = new FormData();
-		fd_buttonMinimize.top = new FormAttachment(buttonRefreshBoot, 6);
-		fd_buttonMinimize.left = new FormAttachment(buttonRefreshBoot, 0, SWT.LEFT);
-		buttonMinimize.setLayoutData(fd_buttonMinimize);
 		FormData fd_groupIcon = new FormData();
 		fd_groupIcon.bottom = new FormAttachment(groupMisc, 0, SWT.BOTTOM);
 		fd_groupIcon.left = new FormAttachment(0, 374);
@@ -473,6 +462,7 @@ public class Preferences extends Dialog {
 			boolean refreshOnStartup;
 			boolean minimize;
 			boolean primaryGame;
+			boolean shader;
 			int sliderVal;
 			String modDir;
 			String gameDir;
@@ -483,6 +473,7 @@ public class Preferences extends Dialog {
 			refreshOnStartup = Boolean.parseBoolean(p.getProperty("RefreshOnStartup"));
 			minimize = Boolean.parseBoolean(p.getProperty("Minimize"));
 			primaryGame = Boolean.parseBoolean(p.getProperty("PrimaryGame"));
+			shader = Boolean.parseBoolean(p.getProperty("ApplyShaders"));
 			sliderVal = Integer.parseInt(p.getProperty("IconSize"));
 
 			if(useSameDir) {
@@ -503,6 +494,9 @@ public class Preferences extends Dialog {
 
 			if(minimize)			buttonMinimize.setSelection(true);
 			else 					buttonMinimize.setSelection(false);
+			
+			if(shader)				buttonApplyShader.setSelection(true);
+			else 					buttonApplyShader.setSelection(false);
 
 			textGameDir.setText(gameDir);
 			textModDir.setText(modDir);
