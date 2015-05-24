@@ -8,3 +8,5 @@ This is the entire Eclipse project. You can import it by placing it in your Ecli
 Otherwise you can use File > Import.
 
 Developed throughout July 2014 by a Java noob. Enjoy!
+
+Updated to 1.3 during February 2015 and published. 
