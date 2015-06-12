@@ -25,6 +25,7 @@ public class ModList {
 	private static String modDesc;
 	private static String modMinVer;
 	private static String modShader;
+	private static String modExecName;
 	
 	private static List<TableItem> listDataArr = new ArrayList<TableItem>();
 	
@@ -34,6 +35,7 @@ public class ModList {
 	private static List<String> infoDescription = new ArrayList<String>();
 	private static List<String> infoMinCompatibility = new ArrayList<String>();
 	private static List<String> infoCustomShaders = new ArrayList<String>();
+	private static List<String> infoCustomExecName = new ArrayList<String>();
 	private static String filePath;
 
 	private Properties cfg = new Properties();
@@ -65,80 +67,75 @@ public class ModList {
 		infoDescription.clear();
 		infoMinCompatibility.clear();
 		infoCustomShaders.clear();
-	}
-	
-	/**
-	 * Gets the default icon for a mod in the list.
-	 * @return defIcon
-	 */
-	public String getDefIcon()
-	{
-		return this.defIcon;
-	}
-	
-	/**
-	 * Gets the title of a mod.
-	 * @return modTitle
-	 */
-	public String getModTitle()
-	{
-		return ModList.modTitle;
+		infoCustomExecName.clear();
 	}
 	
 	/**
 	 * Gets the list of mods.
 	 * @return listDataArr
 	 */
-	public List<TableItem> getMods()
-	{
+	public List<TableItem> getMods() {
 		return ModList.listDataArr;
 	}
+
+	public String getModTitle() {
+		return ModList.modTitle;
+	}
 	
-	/**
-	 * Gets the icon of a mod.
-	 * @return modIcon
-	 */
-	public String getModIcon()
-	{
+	public String getModIcon() {
 		return ModList.modIcon;
 	}
 	
-	/**
-	 * Gets the author of a mod.
-	 * @return modAuthor
-	 */
-	public String getModAuthor()
-	{
+	public String getModAuthor() {
 		return ModList.modAuthor;
 	}
 	
-	/**
-	 * Gets the description of a mod.
-	 * @return modDesc
-	 */
-	public String getModDesc()
-	{
+	public String getModDesc() {
 		return ModList.modDesc;
 	}
 	
-	/**
-	 * Gets the shader status of a mod.
-	 * @return
-	 */
-	public String getModHasShaders()
-	{
-		return ModList.modShader;
-	}
-	
-	/**
-	 * Gets the amount of mods found in total from previous search.
-	 * @return modsFoundTotal
-	 */
-	public int getModsFound()
-	{
+	public int getModsFound() {
 		return ModList.modsFoundTotal;
 	}
 	
+	public String getModHasCustomShaders() {
+		return ModList.modShader;
+	}
+	
+	public String getModExecName() {
+		return ModList.modExecName;
+	}
+	
+	public String getModMinCompatibility(int idx) {
+		String comp = infoMinCompatibility.get(idx);
+		return comp;
+	}
+	
+	public String getModTitle(int idx) {
+		String title = infoTitle.get(idx);
+		return title;
+	}
+	
+	public String getModAuthor(int idx) {
+		String author = infoAuthor.get(idx);
+		return author;
+	}
+	
+	public String getModDesc(int idx) {
+		String desc = infoDescription.get(idx);
+		return desc;
+	}
+	
+	public String getModHasCustomShaders(int idx) {
+		String customShaders = infoCustomShaders.get(idx);
+		return customShaders;
+	}
+	
+	public String getModExecName(int idx) {
+		String execName = infoCustomExecName.get(idx);
+		return execName;
+	}
+
 	/**
 	 * Searches through a directory and its sub-directories, then sets up a new mod list.
 	 * @param name = name of file to find.
@@ -184,62 +181,9 @@ public class ModList {
 		infoDescription.add(modDesc);
 		infoMinCompatibility.add(modMinVer);
 		infoCustomShaders.add(modShader);
+		infoCustomExecName.add(modExecName);
 		
 		Log.info("Adding information to list at index: " + modsFoundTotal);
-	}
-
-	/**
-	 * Gets the minimum compatibility value of a listed mod.
-	 * @param idx = Mod index to get from.
-	 * @return infoMinCompatibility
-	 */
-	public String getModMinCompatibility(int idx)
-	{
-		return infoMinCompatibility.get(idx);
-	}
-	
-	/**
-	 * Gets the title of a listed mod.
-	 * @param idx = Mod index to get from.
-	 * @return title
-	 */
-	public String getModTitle(int idx)
-	{
-		String title = infoTitle.get(idx);
-		return title;
-	}
-	
-	/**
-	 * Gets the author of a listed mod.
-	 * @param idx = Mod index to get from.
-	 * @return infoAuthor
-	 */
-	public String getModAuthor(int idx)
-	{
-		String author = infoAuthor.get(idx);
-		return author;
-	}
-	
-	/**
-	 * Gets the description of a listed mod.
-	 * @param idx = Mod index to get from.
-	 * @return infoDescription
-	 */
-	public String getModDesc(int idx)
-	{
-		String desc = infoDescription.get(idx);
-		return desc;
-	}
-	
-	/**
-	 * Gets the shader entry of a listed mod.
-	 * @param idx - Mod index to get from.
-	 * @return infoCustomShaders
-	 */
-	public String getModHasCustomShaders(int idx)
-	{
-		String customShaders = infoCustomShaders.get(idx);
-		return customShaders;
 	}
 	
 	/**
@@ -267,27 +211,28 @@ public class ModList {
 		//Defaults
 		modTitle = "Untitled";
 		modAuthor = "Anonymous";
-		modIcon = "a.png";
+		modIcon = "";
 		modDesc = "No description.";
 		modMinVer = "Undefined";
 		modShader = "Undefined";
+		modExecName = null;
 				
 		TableItem modItem = new TableItem(MainFrame.tableMods, SWT.NONE);
 		modItem.setFont(SWTResourceManager.getFont("System", 11, SWT.NORMAL));
 		
 		try {
-			String cfgNameNew = "modloader.cfg";
-			String cfgName = "aml.cfg";
+			String cfgName = "modloader.cfg";
+			String cfgNameLegacy = "aml.cfg";
 			String cfgPath = fil.getParent().toString();
 			
-			boolean found = findFile(cfgNameNew, new File(cfgPath));
-			if(!found) findFile(cfgName, new File(cfgPath));
+			boolean found = findFile(cfgName, new File(cfgPath));
+			if(!found) findFile(cfgNameLegacy, new File(cfgPath));
 
 			inputInit = new FileInputStream(fil);
 			
 			try {
-				if(found) inputCFG = new FileInputStream(cfgPath + File.separator + cfgNameNew);
-				else inputCFG = new FileInputStream(cfgPath + File.separator + cfgName);
+				if(found) inputCFG = new FileInputStream(cfgPath + File.separator + cfgName);
+				else inputCFG = new FileInputStream(cfgPath + File.separator + cfgNameLegacy);
 				cfgFound = true;
 			} catch (FileNotFoundException e) {
 				Log.warn("Could not find modloader.cfg or aml.cfg. Oh well.");
@@ -300,34 +245,37 @@ public class ModList {
 			} catch (IOException e) {
 				modTitle = "Untitled";
 				Log.warn("GameName not found. Mod incomplete?");
-				//e.printStackTrace();
+				//Log.error(e);
 				modItem.setFont(SWTResourceManager.getFont("System", 11, SWT.ITALIC));
-			}			
+			}
+			
+			File f = new File(fil.getParent());
+			f = new File(f.getParent() + File.separator + "shaders");
+
+			Log.info(f.toString());
+
+			if(f.isDirectory()) {
+				modShader = "Yes";
+			} else modShader = "No";
 			
 			if(cfgFound) {
 				cfg.load(inputCFG);
 				if(cfg.getProperty("Author") != null) modAuthor = cfg.getProperty("Author"); 
 				if(cfg.getProperty("IconFile") != null) modIcon = cfg.getProperty("IconFile"); 
-				if(cfg.getProperty("Description") != null) modDesc = cfg.getProperty("Description");
+				if(cfg.getProperty("Description") != null) modDesc = cfg.getProperty("Description").replace("â", "'");
 				try {
 					if(cfg.getProperty("MinVersion") != null) modMinVer = ""+Float.parseFloat(cfg.getProperty("MinVersion")); 
 				} catch (NumberFormatException e) {
 					Log.warn("\t\tCould not parse float from MinVersion");
 				}
-				try {
-					if(cfg.getProperty("CustomShaders") != null) {
-						String s = ""+Boolean.parseBoolean(cfg.getProperty("CustomShaders"));
-						if(s.equals("true")) modShader = "Yes";
-						else if(s.equals("false")) modShader = "No";
-					}
-				} catch (Exception e) {
-					Log.warn("\t\tCould not parse boolean from CustomShaders");
-				}
+				
+				if(cfg.getProperty("CustomExecName") != null) modExecName = cfg.getProperty("CustomExecName");
 				Log.info("\t\tAuthor \t\t= " + modAuthor);
 				Log.info("\t\tDescription \t= " + modDesc);
 				Log.info("\t\tIconFile \t= " + modIcon);
 				Log.info("\t\tMinVersion \t= " + modMinVer);
 				Log.info("\t\tCustomShaders \t= " + modShader);
+				Log.info("\t\tCustomExecName \t= " + modExecName);
 			}
 			
 			this.addModInfo();
@@ -338,19 +286,19 @@ public class ModList {
 				
 				if(iconFile.exists())
 				{
-					//Resize the image to 64x64.
+					//scale the image to specified size.
 					Image image = new Image(Display.getDefault(), iconFile.toString());
-					modItem.setImage(Common.scaleImage(image, MainFrame.getIconSize()));
+					modItem.setImage(Common.scale(image, MainFrame.getIconSize()));
 					
 				} else {
 					Log.warn("Icon file not found. Using default.");
-					modItem.setImage(Common.scaleImage(SWTResourceManager.getImage(MainFrame.class, "/resources/icon_default.png"), MainFrame.getIconSize()));
+					modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrame.class, defIcon), MainFrame.getIconSize()));
 				}
 				
 			} catch(Exception e) {
 				Log.error("\t\tFailed adding icon: " + cfgPath + File.separator + modIcon);
-				modItem.setImage(Common.scaleImage(SWTResourceManager.getImage(MainFrame.class, "/resources/icon_default.png"), MainFrame.getIconSize()));
-				//e.printStackTrace();
+				modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrame.class, defIcon), MainFrame.getIconSize()));
+				//Log.error(e);
 			}
 			
 			modsFoundTotal += 1;
@@ -359,14 +307,14 @@ public class ModList {
 			
 		} catch (IOException e) {
 			Log.error("IOException");
-			e.printStackTrace();
+			Log.error(e);
 		} finally {
 			if(inputCFG != null) {
 				try {
 					inputCFG.close();
 				} catch (IOException e) {
 					Log.error("IOException");
-					e.printStackTrace();
+					Log.error(e);
 				}
 			}
 		}

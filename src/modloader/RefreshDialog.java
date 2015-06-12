@@ -43,7 +43,11 @@ public class RefreshDialog extends Dialog {
 	 * Closes the dialog.
 	 */
 	public void close() {
-		shell.close();
+		try {
+			shell.close();
+		} catch (Exception e) {
+			
+		}
 	}
 
 	/**

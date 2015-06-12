@@ -3,15 +3,13 @@ package modloader;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -20,7 +18,9 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
@@ -35,17 +35,18 @@ import de.ikoffice.widgets.SplitButton;
 
 public class MainFrame {
 	
-	private final static String appVersion = "1.3.2";
 	private final static String appName = "Amnesia Modloader";
+	private final static String appVersion = "1.4.2";
 	private final static String cfgName = "main_init.cfg";
 	
 	private static String modDirectory = "";
 	private static String gameDirectory = "";
+	
+	private static boolean warnExec = true, warnShader = true;
 
 	private static List<String> shadersList = new ArrayList<String>();
 	private static ModList modList;
 	private static Refresh refresh = new Refresh();
-	private static Properties settings = new Properties();
 	private File[] list;
 	public static boolean useSameDir = true;
 	public static boolean refreshBoot = false;
@@ -58,14 +59,16 @@ public class MainFrame {
 	private static Shell shell;
 	public static Composite rightPanel, leftPanel;
 	public static Table tableMods;
-	private static Button buttonRefresh, buttonFolder, buttonPrefs, buttonLaunch, buttonQuit;
+	private static Button buttonRefresh, buttonFolder, buttonPrefs, buttonLaunch, buttonQuit, buttonLaunch2;
 	private static TableColumn columnMods;
 	private static Label labelShader, labelShaderVal, sep, labelModsFound, labelModAmount;
+	private static MenuItem menuItemLauncher, menuItemGame;
 	private static FormData 	fd_buttonRefresh, fd_buttonFolder, fd_buttonPrefs, fd_buttonLaunch, fd_buttonQuit,
-								fd_rightPanel, fd_leftPanel, fd_tableMods, fd_labelModAmount, fd_labelModsFound, fd_sep;
+								fd_rightPanel, fd_leftPanel, fd_tableMods, fd_labelModAmount, fd_labelModsFound, fd_sep, fd_buttonLaunch2;
+	private Menu menuList;
 	
 	public static int getIconSize() {
-		int i = 64;
+		int i = 48;
 		
 		Properties p = ConfigManager.loadConfig(Preferences.prefPath);
 
@@ -85,12 +88,13 @@ public class MainFrame {
 			case 3: {
 				i = 16; break;
 			}
+			default: {
+				i = 48; break;
+			}
 			}
 		} catch (Exception e) {
-			Log.error("Could not get and resize image.");
+			Log.error("Could not get and scale image.");
 		}
-
-		//Log.info("Icon size = " + i);
 		return i;
 	}
 	
@@ -124,6 +128,22 @@ public class MainFrame {
 		return shell;
 	}
 	
+	public static void setWarnExec(boolean var) {
+		warnExec = var;
+	}
+	
+	public static boolean getWarnExec() {
+		return warnExec;
+	}
+	
+	public static void setWarnShader(boolean var) {
+		warnShader = var;
+	}
+	
+	public static boolean getWarnShader() {
+		return warnShader;
+	}
+	
 	public static void setModDirectory(String dir)
 	{
 		modDirectory = dir;
@@ -138,96 +158,7 @@ public class MainFrame {
 	{
 		return shadersList;
 	}
-	
-	public static void findShaders(File whichDirectory)
-	{
-		String shadersExt = "glsl";
-		String fileExt = "";
-		String fileName = "";
-		int i = 0;
 		
-		File[] l;
-		l = whichDirectory.listFiles();
-		
-		if(l != null) {
-			for (File f : l) {
-				if (f.isDirectory()) {
-					findShaders(f);
-				}
-				
-				if (f.isFile())
-				{
-					fileName = f.getName();
-
-					i = fileName.lastIndexOf('.');
-					fileExt = fileName.substring(i+1);
-
-					if (fileExt.equals(shadersExt)) {
-						shadersList.add(f.getAbsolutePath());						
-					}
-				}
-			}
-		}
-	}
-	
-	public static void resetShaders()
-	{
-		File fShadersDir = new File(gameDirectory, "core/shaders");	
-		File[] files;
-		files = fShadersDir.listFiles();
-		
-		File fElement = new File("");
-		
-	    for(File f : files) {
-	    	fElement = new File(f.getAbsolutePath() + "_back");
-            if(fElement.exists()) {
-            	f.delete();
-            	fElement.renameTo(f);
-            }
-        }
-	}
-	
-	public static void placeShaders ()
-	{
-		Log.info("Shaders found: " + shadersList.size());
-		
-		//No custom shaders, exit.
-		if(shadersList.isEmpty()) { return; }
-		
-		//Variables
-		String sShaderName = "";
-		String sElement = shadersList.get(0);
-		File fElement = new File(sElement);
-		
-		File fShadersDir = new File(gameDirectory, "core/shaders");
-		File fShaderName = new File("");
-		
-		//Find, rename, copy
-		for(int i = 0;i < shadersList.size(); i++) {
-			sElement = shadersList.get(i);
-			fElement = new File(sElement);
-			sShaderName = fElement.getName();
-			fShaderName = new File(fShadersDir, sShaderName);
-			if(fShaderName.exists()) {
-				File fTempShader = new File(fShaderName.getAbsolutePath() + "_back");
-				
-				try {
-					fShaderName.renameTo(fTempShader);
-					Files.copy(fElement.toPath(), fShaderName.toPath(), StandardCopyOption.REPLACE_EXISTING);
-				} catch (SecurityException fe) {
-					Log.error("SecurityException");
-					Log.error(fe);
-				} catch (NullPointerException fa) {
-					Log.error("NullPointerException");
-					Log.error(fa);
-				} catch (IOException e) {
-					Log.error("IOException");
-					Log.error(e);
-				}
-			}
-		}
-	}
-	
 	public static void setupModList(List<TableItem> data) 
 	{	
 		tableMods.setData(data);
@@ -286,6 +217,7 @@ public class MainFrame {
 		} catch (Exception e) {
 			Log.error("Failed checking for mods.");			
 			Log.error(e);
+			
 		}
 	}
 	
@@ -301,6 +233,7 @@ public class MainFrame {
 			String desc = "No description.";
 			String compatMin = "Undefined";
 			String shaders = "Undefined";
+			String exec = null;
 			
 			try {
 				if(modDirectory != null || modDirectory != "") {
@@ -312,10 +245,12 @@ public class MainFrame {
 					desc = modList.getModDesc(index);
 
 					compatMin = modList.getModMinCompatibility(index);
-
 					if(compatMin == "" || compatMin == null) compatMin = "Any";
 					
 					shaders = modList.getModHasCustomShaders(index);
+					
+					exec = modList.getModExecName(index);
+					CurrentOS.setCustomExecName(exec);
 				}
 			} catch (Exception e) {
 				Log.error("Failed displaying mod info.");
@@ -325,7 +260,7 @@ public class MainFrame {
 				m.setText("Error");
 				m.open();
 				
-				e.printStackTrace();
+				Log.error(e);
 			}
 			labelTitle.setText(title);
 			labelAuthor.setText(author);
@@ -341,6 +276,23 @@ public class MainFrame {
 	}
 	
 	/**
+	 * Edits the launch button if necessary, by replacing it with another simple one.
+	 * @param var
+	 */
+	public static void editLaunch(String var)
+	{
+		if(var != null) {
+			buttonLaunch.setVisible(false);
+			buttonLaunch2.setVisible(true);
+			menuItemLauncher.setEnabled(false);
+		} else {
+			buttonLaunch.setVisible(true);
+			buttonLaunch2.setVisible(false);
+			menuItemLauncher.setEnabled(true);
+		}
+	}
+	
+	/**
 	 * Create contents of the window.
 	 */
 	protected void createContents() {
@@ -350,9 +302,33 @@ public class MainFrame {
 		shell.setSize(703, 578);
 		shell.setText(appName);
 		shell.setLayout(new FormLayout());
-		shell.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent event) {
-				Log.info("Closing application.");
+		shell.addListener(SWT.Close, new Listener() {
+			public void handleEvent(Event event) {
+				event.doit = CurrentOS.shutDown();
+			}
+		});
+		shell.addMouseMoveListener(new MouseMoveListener() {
+			public void mouseMove(MouseEvent arg0) {
+				if(Shaders.installed) {
+					MessageBox m = new MessageBox(shell, SWT.OK | SWT.ICON_QUESTION);
+					m.setText("Restore Shaders?");
+					m.setMessage("Are you ready to restore the shaders? Please make sure you've closed the game, then click OK. The custom shaders will be uninstalled and the original ones restored.");
+					if(m.open() != -1) {
+						Log.info("Restore shaders!");
+						boolean b = Shaders.uninstallShaders();
+						if(b) {
+							MessageBox m2 = new MessageBox(shell, SWT.OK | SWT.ICON_INFORMATION);
+							m2.setText("Success");
+							m2.setMessage("The shaders were successfully restored!");
+							m2.open();
+						} else {
+							MessageBox m2 = new MessageBox(shell, SWT.OK | SWT.ICON_INFORMATION);
+							m2.setText("Failed");
+							m2.setMessage("The shaders could not be restored. You might have to do so manually.");
+							m2.open();
+						}
+					}
+				}
 			}
 		});
 		Common.center(shell);
@@ -363,6 +339,8 @@ public class MainFrame {
 			gameDirectory = p.getProperty("GameDir");
 			refreshBoot = Boolean.parseBoolean(p.getProperty("RefreshOnStartup"));
 			startGame = Boolean.parseBoolean(p.getProperty("PrimaryGame"));
+			setWarnExec(Boolean.parseBoolean(p.getProperty("WarnExec")));
+			setWarnShader(Boolean.parseBoolean(p.getProperty("WarnShader")));
 		} catch (Exception e1) {
 			Log.error("Error loading config: " + Preferences.prefPath);
 		}
@@ -386,12 +364,12 @@ public class MainFrame {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				try {
-					Log.info("Opening mods folder at: " + modDirectory);
-					Desktop.getDesktop().open(new File(modDirectory));
+					Log.info("Opening mods folder at: " + getModDirectory());
+					Desktop.getDesktop().open(new File(getModDirectory()));
 				} catch (IllegalArgumentException e) {
 					Log.error("Could not open folder destination.");
 				} catch (IOException e) {
-					e.printStackTrace();
+					Log.error(e);
 				}
 			}
 		});
@@ -420,13 +398,35 @@ public class MainFrame {
 			}
 		});
 		
+		buttonLaunch2 = new Button(shell, SWT.NONE);
+		buttonLaunch2.setLayoutData(new FormData());
+		buttonLaunch2.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		buttonLaunch2.setText("Launch mod");
+		shell.setDefaultButton(buttonLaunch);
+		buttonLaunch2.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				if(warnExec) {
+					MessageBox m = new MessageBox(shell, SWT.SHEET | SWT.YES | SWT.NO | SWT.ICON_INFORMATION);
+					m.setText("Mod Launch");
+					m.setMessage("This mod features a custom executable. This means that, according to the author, you must start this executable in order to play this mod.\nAre you sure you want to start this mod?");
+					int i = m.open();
+					if(i != SWT.YES) return;
+				}
+				launchMod(CurrentOS.getGameExe());
+			}
+		});
+		buttonLaunch2.setVisible(false);
+		
 		buttonQuit = new Button(shell, SWT.NONE);
 		buttonQuit.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				resetShaders();
-				shell.close();
-				System.exit(0);
+				//resetShaders();
+				if(CurrentOS.shutDown()) {
+					Log.printLog();
+					System.exit(0);
+				}
 			}
 		});
 		buttonQuit.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
@@ -446,6 +446,7 @@ public class MainFrame {
 		labelTitle.setText("Mod Title");
 		
 		textDesc = new Text(rightPanel, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
+		textDesc.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		textDesc.setText("This is the description of the mod selected in the list to the right.");
 		textDesc.setBounds(10, 59, 319, 174);
 		
@@ -504,6 +505,29 @@ public class MainFrame {
 		if(refreshBoot) {
 			refresh.refreshList();
 		}
+		
+		menuList = new Menu(tableMods);
+		tableMods.setMenu(menuList);
+		
+		menuItemLauncher = new MenuItem(menuList, SWT.NONE);
+		menuItemLauncher.setImage(SWTResourceManager.getImage(MainFrame.class, "/resources/icon_launcher.png"));
+		menuItemLauncher.setText("Start Launcher");
+		menuItemLauncher.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				launchMod(CurrentOS.getLauncherExe());
+			}
+		});
+		
+		menuItemGame = new MenuItem(menuList, SWT.NONE);
+		menuItemGame.setImage(SWTResourceManager.getImage(MainFrame.class, "/resources/icon_game.png"));
+		menuItemGame.setText("Start Game");
+		menuItemGame.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				launchMod(CurrentOS.getGameExe());
+			}
+		});
 
 		//Design setup
 		fd_tableMods = new FormData();
@@ -544,22 +568,28 @@ public class MainFrame {
 		fd_buttonFolder.bottom = new FormAttachment(100, -10);
 		fd_buttonFolder.top = new FormAttachment(leftPanel, 6);
 		fd_buttonFolder.left = new FormAttachment(0, 10);
-		fd_buttonFolder.right = new FormAttachment(0, 140);
+		fd_buttonFolder.right = new FormAttachment(0, 120);
 		buttonFolder.setLayoutData(fd_buttonFolder);
 		fd_buttonPrefs = new FormData();
 		fd_buttonPrefs.bottom = new FormAttachment(100, -10);
 		fd_buttonPrefs.top = new FormAttachment(rightPanel, 6);
 		fd_buttonPrefs.right = new FormAttachment(100, -10);
-		fd_buttonPrefs.left = new FormAttachment(100, -140);
+		fd_buttonPrefs.left = new FormAttachment(100, -120);
 		buttonPrefs.setLayoutData(fd_buttonPrefs);
 		fd_buttonLaunch = new FormData();
-		fd_buttonLaunch.left = new FormAttachment(buttonFolder, 78);
+		fd_buttonLaunch.left = new FormAttachment(buttonFolder, 108);
 		fd_buttonLaunch.right = new FormAttachment(buttonQuit, -6);
 		fd_buttonLaunch.bottom = new FormAttachment(100, -10);
 		fd_buttonLaunch.top = new FormAttachment(leftPanel, 6);
 		buttonLaunch.setLayoutData(fd_buttonLaunch);
+		fd_buttonLaunch2 = new FormData();
+		fd_buttonLaunch2.left = new FormAttachment(buttonFolder, 108);
+		fd_buttonLaunch2.right = new FormAttachment(buttonQuit, -6);
+		fd_buttonLaunch2.bottom = new FormAttachment(100, -10);
+		fd_buttonLaunch2.top = new FormAttachment(leftPanel, 6);
+		buttonLaunch2.setLayoutData(fd_buttonLaunch2);
 		fd_buttonQuit = new FormData();
-		fd_buttonQuit.right = new FormAttachment(buttonPrefs, -93);
+		fd_buttonQuit.right = new FormAttachment(buttonPrefs, -123);
 		fd_buttonQuit.left = new FormAttachment(0, 344);
 		fd_buttonQuit.bottom = new FormAttachment(100, -10);
 		fd_buttonQuit.top = new FormAttachment(rightPanel, 6);
@@ -587,6 +617,7 @@ public class MainFrame {
 
 		MenuItem launcher = new MenuItem(menu, SWT.PUSH);
 		launcher.setText("Start Launcher");
+		launcher.setImage(SWTResourceManager.getImage(MainFrame.class, "/resources/icon_launcher.png"));
 		launcher.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
@@ -597,6 +628,7 @@ public class MainFrame {
 
 		MenuItem amnesia = new MenuItem(menu, SWT.PUSH);
 		amnesia.setText("Start Game");
+		amnesia.setImage(SWTResourceManager.getImage(MainFrame.class, "/resources/icon_game.png"));
 		amnesia.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
@@ -608,12 +640,11 @@ public class MainFrame {
 	
 	/**
 	 * Function used to launch the selected mod. 
-	 * @param exec - The executable to run (Launcher or Amnesia)
+	 * @param exec - The executable to run (Launcher or Amnesia or custom)
 	 */
 	private static void launchMod(String exec) {
 		try {
-			String filePath;
-			filePath = modList.getLaunchIndex(Refresh.getListIndex());
+			String filePath = modList.getLaunchIndex(Refresh.getListIndex());
 			Log.info("Launching mod: " + filePath);
 			
 			Properties p = ConfigManager.loadConfig(Preferences.prefPath);
@@ -621,12 +652,17 @@ public class MainFrame {
 			//Shaders
 			try {
 				if(Boolean.parseBoolean(p.getProperty("ApplyShaders"))) {
-					File whichDirectory = new File(filePath);
-					whichDirectory = new File(whichDirectory.getParent()); //Twice, to up two levels.
-					whichDirectory = new File(whichDirectory.getParent()); //Config/main_init.cfg
-					findShaders(whichDirectory);					
-					resetShaders();
-					placeShaders();					
+					
+					Shaders.updateInfo();
+					if(Shaders.checkShaders()) {
+						if(Shaders.backupShaders()) {
+							Log.info("Shaders were backed up.");;
+						} else {
+							Log.info("Shaders were not backed up.");
+						}
+						
+						Shaders.installShaders();
+					}
 				}
 			} catch (Exception e1) {
 				Log.error(e1);
@@ -634,15 +670,14 @@ public class MainFrame {
 			
 			//Runs the game depending on OS
 			try {
+				if(Boolean.parseBoolean(p.getProperty("Minimize"))) {
+					shell.setMinimized(true);
+				}
 
 				Runtime runTime = Runtime.getRuntime();
 				String[] nullString = null;
 				File workingDir = new File(gameDirectory);
 				runTime.exec(gameDirectory + File.separator + exec + " " + filePath, nullString, workingDir);
-
-				if(Boolean.parseBoolean(settings.getProperty("Minimize"))) {
-					shell.setMinimized(true);
-				}
 				
 				Log.info("Running command: " + gameDirectory + File.separator + exec + " " + filePath);
 			} catch (IOException e) {
@@ -659,7 +694,7 @@ public class MainFrame {
 			m.setMessage("No mod selected to launch.");
 			m.setText("Could not start");
 			m.open();
-			e.printStackTrace();
+			//Log.error(e);
 		}
 	}
 }

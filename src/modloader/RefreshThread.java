@@ -63,14 +63,14 @@ public class RefreshThread extends Thread {
 							modList.resetList();
 						} catch (Exception e) {
 							Log.error("Failed resetList()");
-							e.printStackTrace();
+							Log.error(e);
 							//return;
 						}
 						try {
 							main.checkMods();
 						} catch (Exception e) {
 							Log.error("Failed checkMods()");
-							e.printStackTrace();
+							Log.error(e);
 							dialog.close();
 							//return;
 						}
@@ -79,14 +79,14 @@ public class RefreshThread extends Thread {
 							setupNewList();
 						} catch (Exception e) {
 							Log.error("Failed setupNewList()");
-							e.printStackTrace();
+							Log.error(e);
 							//return;
 						}
 						try {
 							MainFrame.displayModInfo();
 						} catch (Exception e) {
 							Log.error("Failed displayModInfo()");
-							e.printStackTrace();
+							Log.error(e);
 							//return;
 						}
 					} catch (Exception e) {

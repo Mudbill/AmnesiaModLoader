@@ -60,34 +60,30 @@ public class Refresh {
 					modList.resetList();
 				} catch (Exception e) {
 					Log.error("Failed resetList()");
-					e.printStackTrace();
-					//return;
+					Log.error(e);
 				}
 				try {
 					main.checkMods();
 				} catch (Exception e) {
 					Log.error("Failed checkMods()");
-					e.printStackTrace();
-					dialog.close();
-					//return;
+					Log.error(e);
 				}
 								
 				try {
 					setupNewList();
 				} catch (Exception e) {
 					Log.error("Failed setupNewList()");
-					e.printStackTrace();
-					//return;
+					Log.error(e);
 				}
 				try {
 					MainFrame.displayModInfo();
 				} catch (Exception e) {
 					Log.error("Failed displayModInfo()");
-					e.printStackTrace();
-					//return;
+					Log.error(e);
 				}
 			} catch (Exception e) {
 				Log.error("Failed to refresh list.");
+				dialog.close();
 			}
 			
 			dialog.close();

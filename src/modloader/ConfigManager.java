@@ -68,7 +68,7 @@ public class ConfigManager {
 			b = new BufferedWriter(new FileWriter(logPath));
 			b.write(s);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.error(e);
 		} finally {
 			try {
 				b.close();
