@@ -33,7 +33,7 @@ public class CurrentOS {
 	}
 	
 	/**
-	 * Sets OS specific values. If ran from Windows, it will name the start file Amnesia.exe. If ran from OS X, it will name it Amnesia.app instead etc.
+	 * Sets OS specific values. If ran from Windows, it will name the start file Amnesia.exe.
 	 */
 	public void setOSValues()
 	{
@@ -41,23 +41,23 @@ public class CurrentOS {
 		
 		if(system == "Windows") {
 			execExt = ".exe";
-			saveDir = System.getProperty("user.home") + File.separator + "My Documents\\Amnesia\\ModLoader";
+			saveDir = System.getProperty("user.home") + File.separator + "AppData\\Roaming\\Amnesia ModLoader";
 		}
-		else if(system == "MacOS") {
-			execExt = ".app";
-			saveDir = System.getProperty("user.home") + File.separator + "Library/Application Support/Frictional Games/Amnesia/ModLoader";
-		}
-		else if(system == "Linux") {
-			execExt = ".bin";
-			saveDir = System.getProperty("user.home") + File.separator + "Amnesia/ModLoader";
-		}
+//		else if(system == "MacOS") {
+//			execExt = ".app";
+//			saveDir = System.getProperty("user.home") + File.separator + "Library/Application Support/Frictional Games/Amnesia/ModLoader";
+//		}
+//		else if(system == "Linux") {
+//			execExt = ".bin";
+//			saveDir = System.getProperty("user.home") + File.separator + "Amnesia/ModLoader";
+//		}
 
 		gameExe = "Amnesia";
 		launcherExe = "Launcher";
 		defDir = System.getProperty("user.dir");
-		config = "modloader_settings.cfg";
-		portConfig = "port_settings.cfg";
-		log = "modloader_log.log";
+		config = "preferences.cfg";
+		portConfig = "port.cfg";
+		log = "log.log";
 		Log.info("\tSystem = " + system + ", preference directory = " + saveDir);
 	}
 	
@@ -104,11 +104,11 @@ public class CurrentOS {
 			MessageBox m = new MessageBox(MainFrame.getShell(), SWT.SHEET | SWT.ICON_WARNING | SWT.YES | SWT.NO);
 			m.setText("Shutdown?");
 			m.setMessage("It looks like Amnesia might be running. If you shut down the Modloader now, it will not be able to install/uninstall any custom shaders that might be required by the mod. I recommend you shut down Amnesia first.\n\nDo you really want to exit now?");
-			if(m.open() == SWT.YES) {
-				Log.info("Closing application.");
-				return true;
-			} else return false;
+			if(m.open() != SWT.YES) {
+				return false;
+			}
 		}
+		Log.info("Closing application.");
 		return true;
 	}
 	

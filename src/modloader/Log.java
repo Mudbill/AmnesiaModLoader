@@ -11,6 +11,7 @@ public class Log {
 	private static final String INFO = "[INFO]\t\t" ;
 	private static final String ERROR = "[ERROR]\t\t";
 	private static final String WARNING = "[WARNING]\t";
+	private static final String TAB = "\t";
 	
 	private static StringBuilder log = new StringBuilder();
 	
@@ -20,6 +21,11 @@ public class Log {
 		String s = "("+timeStamp+")\t" + INFO + msg;
 		log.append(s + System.lineSeparator());
 		System.out.println(s);
+	}
+	
+	public static String tab()
+	{
+		return TAB;
 	}
 	
 	public static void error(String msg)

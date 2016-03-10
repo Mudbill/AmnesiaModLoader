@@ -53,6 +53,7 @@ public class ConfigManager {
 			properties.store(new FileOutputStream(filePath), null);
 		} catch (IOException e) {
 			Log.error("Could not write config file: " + filePath);
+			Log.error(e);
 		}
 	}
 	

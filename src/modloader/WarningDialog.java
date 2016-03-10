@@ -96,12 +96,12 @@ public class WarningDialog extends Dialog {
 		checkWarnExec.setText("Show");
 		
 		Label labelWarnShader = new Label(composite, SWT.WRAP);
-		labelWarnShader.setBounds(10, 105, 206, 40);
+		labelWarnShader.setBounds(10, 105, 206, 47);
 		labelWarnShader.setText("Display a warning when the Modloader is about to install custom shaders if they are found.");
 		
 		checkWarnShader = new Button(composite, SWT.CHECK);
 		checkWarnShader.setSelection(warnShader);
-		checkWarnShader.setBounds(10, 151, 91, 16);
+		checkWarnShader.setBounds(10, 158, 91, 16);
 		checkWarnShader.setText("Show");
 
 	}

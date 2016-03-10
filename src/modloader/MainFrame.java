@@ -36,7 +36,7 @@ import de.ikoffice.widgets.SplitButton;
 public class MainFrame {
 	
 	private final static String appName = "Amnesia Modloader";
-	private final static String appVersion = "1.4.2";
+	private final static String appVersion = "1.4.3";
 	private final static String cfgName = "main_init.cfg";
 	
 	private static String modDirectory = "";
@@ -537,10 +537,10 @@ public class MainFrame {
 		fd_tableMods.right = new FormAttachment(0, 324);
 		tableMods.setLayoutData(fd_tableMods);
 		fd_leftPanel = new FormData();
-		fd_leftPanel.top = new FormAttachment(buttonRefresh, 184);
-		fd_leftPanel.bottom = new FormAttachment(100, -42);
+		fd_leftPanel.top = new FormAttachment(rightPanel, 0, SWT.TOP);
 		fd_leftPanel.left = new FormAttachment(0, 10);
 		fd_leftPanel.right = new FormAttachment(rightPanel, -6);
+		fd_leftPanel.bottom = new FormAttachment(100, -42);
 		leftPanel.setLayoutData(fd_leftPanel);
 		fd_sep = new FormData();
 		fd_sep.top = new FormAttachment(0, 251);
@@ -577,28 +577,28 @@ public class MainFrame {
 		fd_buttonPrefs.left = new FormAttachment(100, -120);
 		buttonPrefs.setLayoutData(fd_buttonPrefs);
 		fd_buttonLaunch = new FormData();
-		fd_buttonLaunch.left = new FormAttachment(buttonFolder, 108);
-		fd_buttonLaunch.right = new FormAttachment(buttonQuit, -6);
 		fd_buttonLaunch.bottom = new FormAttachment(100, -10);
 		fd_buttonLaunch.top = new FormAttachment(leftPanel, 6);
+		fd_buttonLaunch.left = new FormAttachment(buttonFolder, 108);
+		fd_buttonLaunch.right = new FormAttachment(buttonQuit, -6);
 		buttonLaunch.setLayoutData(fd_buttonLaunch);
 		fd_buttonLaunch2 = new FormData();
-		fd_buttonLaunch2.left = new FormAttachment(buttonFolder, 108);
-		fd_buttonLaunch2.right = new FormAttachment(buttonQuit, -6);
 		fd_buttonLaunch2.bottom = new FormAttachment(100, -10);
 		fd_buttonLaunch2.top = new FormAttachment(leftPanel, 6);
+		fd_buttonLaunch2.left = new FormAttachment(buttonFolder, 108);
+		fd_buttonLaunch2.right = new FormAttachment(buttonQuit, -6);
 		buttonLaunch2.setLayoutData(fd_buttonLaunch2);
 		fd_buttonQuit = new FormData();
-		fd_buttonQuit.right = new FormAttachment(buttonPrefs, -123);
-		fd_buttonQuit.left = new FormAttachment(0, 344);
 		fd_buttonQuit.bottom = new FormAttachment(100, -10);
 		fd_buttonQuit.top = new FormAttachment(rightPanel, 6);
+		fd_buttonQuit.right = new FormAttachment(buttonPrefs, -123);
+		fd_buttonQuit.left = new FormAttachment(0, 344);
 		buttonQuit.setLayoutData(fd_buttonQuit);
 		fd_rightPanel = new FormData();
-		fd_rightPanel.top = new FormAttachment(100, -331);
+		fd_rightPanel.top = new FormAttachment(0, 219);
+		fd_rightPanel.bottom = new FormAttachment(100, -42);
 		fd_rightPanel.left = new FormAttachment(100, -353);
 		fd_rightPanel.right = new FormAttachment(100, -10);
-		fd_rightPanel.bottom = new FormAttachment(100, -42);
 		rightPanel.setLayoutData(fd_rightPanel);
 	}
 	
@@ -646,6 +646,7 @@ public class MainFrame {
 		try {
 			String filePath = modList.getLaunchIndex(Refresh.getListIndex());
 			Log.info("Launching mod: " + filePath);
+			boolean ignore = false;
 			
 			Properties p = ConfigManager.loadConfig(Preferences.prefPath);
 
@@ -653,15 +654,22 @@ public class MainFrame {
 			try {
 				if(Boolean.parseBoolean(p.getProperty("ApplyShaders"))) {
 					
-					Shaders.updateInfo();
-					if(Shaders.checkShaders()) {
-						if(Shaders.backupShaders()) {
-							Log.info("Shaders were backed up.");;
-						} else {
-							Log.info("Shaders were not backed up.");
-						}
-						
-						Shaders.installShaders();
+					if(modList.getModIgnoreShaders(Refresh.getListIndex()).equals("true")) {
+						Log.info("IgnoreShaders detected. Probably main game.");
+						ignore = true;
+					}
+					
+					if(!ignore) {
+						Shaders.updateInfo();
+						if(Shaders.checkShaders()) {
+							if(Shaders.backupShaders()) {
+								Log.info("Shaders were backed up.");;
+							} else {
+								Log.info("Shaders were not backed up.");
+							}
+							
+							Shaders.installShaders();
+						}						
 					}
 				}
 			} catch (Exception e1) {
@@ -669,6 +677,11 @@ public class MainFrame {
 			}
 			
 			//Runs the game depending on OS
+			if(Shaders.cancelOperation < 0) {
+				Shaders.cancelOperation = 1;
+				return;
+			}
+			
 			try {
 				if(Boolean.parseBoolean(p.getProperty("Minimize"))) {
 					shell.setMinimized(true);

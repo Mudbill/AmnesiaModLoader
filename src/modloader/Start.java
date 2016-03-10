@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 
 import org.eclipse.swt.SWT;
@@ -63,7 +66,9 @@ public class Start {
 					Log.info("\tGameDir = " + p.getProperty("GameDir"));
 					Log.info("\tModDir = " + modDir);
 				}
-
+				File rootCfg = new File(p.getProperty("GameDir") + File.separator + "config" + File.separator + "modloader.cfg");
+				checkConfigFolder(rootCfg);
+				
 				MainFrame frame = new MainFrame();
 				MainFrame.setModDirectory(modDir);
 				frame.open();
@@ -71,10 +76,10 @@ public class Start {
 				Log.info("Preferences not found, first startup?");
 
 				MessageBox m = new MessageBox(new Shell(), SWT.SHEET | SWT.ICON_INFORMATION);
-				m.setMessage("Please specify some settings before continuing.\nThese can be changed later by selecting the \"Preferences\" button.");
+				m.setMessage("Welcome! Please specify some settings before continuing.\nThese can be changed later by selecting the \"Preferences\" button in the main window.");
 				m.setText("First time setup");
 				m.open();
-
+				
 				Preferences prefs = new Preferences(new Shell(), SWT.SHEET);
 				prefs.open();
 			}
@@ -82,6 +87,41 @@ public class Start {
 			Log.error(e);
 		} finally {			
 			Log.printLog();				
+		}
+	}
+	
+	public static void checkConfigFolder(File rootCfg) {
+		MessageBox m = new MessageBox(new Shell(), SWT.SHEET | SWT.ICON_INFORMATION | SWT.YES | SWT.NO);
+
+		if (rootCfg.exists() && rootCfg != null) {
+			Log.info("\tRoot config found: " + rootCfg.getPath());
+			Properties rootConfig = ConfigManager.loadConfig(rootCfg.getPath());
+			try {
+				if(rootConfig.getProperty("CfgVersion").equals(MainFrame.getVersion())) {
+					Log.info("\tRoot config version is up to date. Version: " + rootConfig.getProperty("CfgVersion"));
+					return;
+				} else {
+					Log.warn("\tRoot config version is out of date.");
+				}
+			} catch (Exception e) {
+				Log.warn("\tCould not load CfgVersion from config. Might be too old.");
+			}
+			m.setText("Config out of date");
+			m.setMessage("Your specified game directory contains an important file whose version doesn't match the Modloader. Shall I update it? If not, the Modloader may not work properly.");
+		} else {
+			Log.warn("\tRoot config file not found.");
+			m.setText("Config not found");
+			m.setMessage("Your specified game directory is lacking an important file for the Modloader to work. Shall I copy it there now? If not, the Modloader may not work properly.");
+		}
+
+		if(m.open() == SWT.YES) {
+			try {
+				Files.copy(Start.class.getResourceAsStream("/resources/modloader.cfg"), Paths.get(rootCfg.getPath()), StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(Start.class.getResourceAsStream("/resources/default.png"), Paths.get(rootCfg.getParent() + File.separator + "default.png"), StandardCopyOption.REPLACE_EXISTING);
+				Log.info("\tCopied files from jar to config folder.");						
+			} catch (IOException e) {
+				Log.error(e);
+			}
 		}
 	}
 

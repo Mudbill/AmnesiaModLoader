@@ -13,8 +13,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
@@ -22,6 +24,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.custom.ScrolledComposite;
 
 public class Preferences extends Dialog {
 
@@ -38,7 +41,7 @@ public class Preferences extends Dialog {
 	private Object result;
 	private Shell shell;
 	private Button buttonBrowseGame, radioUseSame, radioUseCustom, buttonBrowseMod, buttonCancel, buttonOK, buttonRefreshBoot, buttonWeb, radioLauncher, radioGame, buttonMinimize, buttonApplyShader, buttonYoutube, buttonTwitter, buttonForum, buttonWarnings;
-	private Text textGameDir, textModDir, textAbout;
+	private Text textGameDir, textModDir;
 	private TabFolder tabFolder;
 	private TabItem tabGeneral, tabAbout;
 	private Composite panelGeneral, panelAbout;
@@ -115,12 +118,6 @@ public class Preferences extends Dialog {
 		labelAuthor.setAlignment(SWT.RIGHT);
 		labelAuthor.setText("Developed by Mudbill");
 		
-		textAbout = new Text(panelAbout, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
-		textAbout.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		textAbout.setBounds(10, 52, 506, 210);
-		textAbout.setEditable(false);
-		textAbout.setText("Thanks for using this application. More information as well as updates can be found on the official thread over at my website. Click the button below to open the page.\r\n\r\n--- How to use ---\r\n\r\nWhen you open the program for the first time, you will be presented with the preferences. \r\nUse the Game Directory browser to find your game location. You can also specify a mod directory and a few other settings as you like. \r\n\r\nThe default game directory depends on whether you have a Steam copy or a retail copy.\r\n\r\n\tSteam:\r\n32-bit\tC:\\Program Files\\Steam\\SteamApps\\common\\Amnesia The Dark Descent\r\n64-bit\tC:\\Program Files (x86)\\Steam\\SteamApps\\common\\Amnesia The Dark Descent\r\n\r\n\tRetail:\r\n32-bit\tC:\\Program Files\\Amnesia The Dark Descent\\redist\r\n64-bit\tC:\\Program Files (x86)\\Amnesia The Dark Descent\\redist\r\n\r\nOnce you accept the preferences, your settings will be saved in your Amnesia save directory/ModLoader. \r\n\r\nThe main window will open, and will open first the next time you start it. \r\nIf the list is empty, click Refresh in the top left corner to update the list depending on your mod directory. This might take some time depending on the size of your folder and the speed of your computer.\r\n\r\nWhen the list of mods is available, you may select any you wish to play and click Launch Mod at the bottom. Alternatively, you can hit the arrow on the button to specify whether you want to start the launcher or the game directly. \r\n\r\nAfter selecting a mod, some information will be displayed on the right side. This includes the name of the mod, as well as extra information if available. A mod creator can add a modloader.cfg file to their /config folder to specify entries to display. These include author, description, minimum version and custom shaders. It can also contain a custom icon which will show up in the list to the left. \r\n\r\n--- For creators ---\r\n\r\nIf you want to fully support this modloader (which I'd be very happy about) you can add an extra config file to your mod's /config folder. Instructions on how to do so are at the website. Click the button below.\r\n\r\n--- Credits ---\r\n\r\nMudbill (ME :D)\t\t- Primary development.\r\nAmn/Daemian\t\t- Extra development and custom shader support.\r\nTraggey\t\t\t- Background and icon artwork.\r\nMrBehemoth\t\t- Initial beta testing.\r\nKreekakon\t\t\t- Beta testing.\r\nLazzer\t\t\t\t- Beta testing.\r\n\r\n---\r\n\r\nPlease be on the lookout for issues and report them to me so I can try fixing them. Suggestions for features are also nice.");
-		
 		buttonWeb = new Button(panelAbout, SWT.NONE);
 		buttonWeb.setBounds(10, 268, 250, 55);
 		buttonWeb.setToolTipText(urlWeb);
@@ -194,6 +191,20 @@ public class Preferences extends Dialog {
 		labelEmail.setAlignment(SWT.RIGHT);
 		labelEmail.setBounds(300, 333, 152, 17);
 		labelEmail.setText("mudbill@buttology.net");
+		
+		ScrolledComposite scrolledComposite = new ScrolledComposite(panelAbout, SWT.BORDER | SWT.V_SCROLL);
+		scrolledComposite.setExpandVertical(true);
+		scrolledComposite.setBounds(10, 52, 506, 210);
+		scrolledComposite.setExpandHorizontal(true);
+		
+		ShellAbout shellAbout = new ShellAbout(scrolledComposite, SWT.NONE);
+		scrolledComposite.setContent(shellAbout);
+		scrolledComposite.setMinSize(shellAbout.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		shellAbout.addListener(SWT.Activate, new Listener() {
+		    public void handleEvent(Event event) {
+		        scrolledComposite.setFocus();
+		    }
+		});
 		
 		groupDir = new Group(panelGeneral, SWT.NONE);
 		groupDir.setBounds(10, 10, 506, 177);
@@ -368,7 +379,7 @@ public class Preferences extends Dialog {
 		
 		buttonWarnings = new Button(groupMisc, SWT.NONE);
 		buttonWarnings.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		buttonWarnings.setBounds(236, 130, 74, 23);
+		buttonWarnings.setBounds(225, 130, 85, 23);
 		buttonWarnings.setText("Warnings");
 		buttonWarnings.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -380,7 +391,7 @@ public class Preferences extends Dialog {
 		
 		buttonOK = new Button(shell, SWT.NONE);
 		buttonOK.setBounds(378, 407, 80, 23);
-		buttonOK.setText("OK");
+		buttonOK.setText("Save");
 		shell.setDefaultButton(buttonOK);
 		buttonOK.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -445,6 +456,7 @@ public class Preferences extends Dialog {
 					shell.close();
 					
 					if(firstTime) {
+						Start.checkConfigFolder(new File(gameDir + File.separator + "config" + File.separator + "modloader.cfg"));
 						MainFrame frame = new MainFrame();
 						frame.open();
 						firstTime = false;
