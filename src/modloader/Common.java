@@ -1,7 +1,14 @@
 package modloader;
 
 import java.awt.Desktop;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
@@ -60,4 +67,41 @@ public class Common {
 
         shell.setBounds(nLeft, nTop, p.x, p.y);
     }
+	
+	public static int getFileAmount(Path path) 
+	{
+		final AtomicLong files = new AtomicLong(0);
+		
+		try {
+			Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+				
+				@Override 
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+					if(MainFrame.abortRefresh) return null;
+					files.addAndGet(1);
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override 
+				public FileVisitResult visitFileFailed(Path file, IOException exc) {
+					if(MainFrame.abortRefresh) return null;
+					Log.info("Skipped file traversing: " + file + " (" + exc + ")");
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override 
+				public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+					if(MainFrame.abortRefresh) return null;
+					if (exc != null)
+						Log.error("Had trouble traversing: " + dir + " (" + exc + ")");
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		} catch (IOException e) {
+			throw new AssertionError("walkFileTree will not throw IOException if the FileVisitor does not");
+		} catch (NullPointerException e) {
+			Log.info("Cancelled file scanning.");
+		}
+		return files.intValue();
+	}
 }

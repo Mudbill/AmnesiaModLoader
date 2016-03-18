@@ -2,7 +2,6 @@ package modloader;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -17,29 +16,31 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 public class ModList {
 	
-	public final String defIcon = "/resources/icon_default.png";
+	public static final String defIcon = "/resources/icon_default.png";
 	
 	private static String modIcon, modTitle, modAuthor, modDesc, modMinVer, modShader, modExecName, modIgnoreShaders;
 	
-	private static List<TableItem> listDataArr = new ArrayList<TableItem>();
+	public static List<TableItem> listDataArr = new ArrayList<TableItem>();
 	
-	private static List<String> index = new ArrayList<String>();
-	private static List<String> infoTitle = new ArrayList<String>();
-	private static List<String> infoAuthor = new ArrayList<String>();
-	private static List<String> infoDescription = new ArrayList<String>();
-	private static List<String> infoMinCompatibility = new ArrayList<String>();
-	private static List<String> infoCustomShaders = new ArrayList<String>();
-	private static List<String> infoCustomExecName = new ArrayList<String>();
-	private static List<String> infoIgnoreShaders = new ArrayList<String>();
+	public static List<String> index = new ArrayList<String>();
+	public static List<String> infoTitle = new ArrayList<String>();
+	public static List<String> infoAuthor = new ArrayList<String>();
+	public static List<String> infoDescription = new ArrayList<String>();
+	public static List<String> infoMinCompatibility = new ArrayList<String>();
+	public static List<String> infoCustomShaders = new ArrayList<String>();
+	public static List<String> infoCustomExecName = new ArrayList<String>();
+	public static List<String> infoIgnoreShaders = new ArrayList<String>();
 	private static String filePath;
+	public static List<File> listIcon = new ArrayList<File>();
 
 	private Properties cfg = new Properties();
 	private Properties mainInit = new Properties();
 	private InputStream inputCFG = null;
 	private InputStream inputInit = null;
-	private static File[] list;
+	//private static File[] list;
 	public static int modsFoundTotal = 0;
 	private boolean cfgFound = false;
+	//private boolean found;
 
 	public ModList() {}
 	
@@ -64,6 +65,7 @@ public class ModList {
 		infoCustomShaders.clear();
 		infoCustomExecName.clear();
 		infoIgnoreShaders.clear();
+		listIcon.clear();
 	}
 	
 	/**
@@ -126,6 +128,11 @@ public class ModList {
 		return desc;
 	}
 	
+	public String getModIcon(int idx) {
+		String icon = listIcon.get(idx).toString();
+		return icon;
+	}
+	
 	public String getModHasCustomShaders(int idx) {
 		String customShaders = infoCustomShaders.get(idx);
 		return customShaders;
@@ -140,31 +147,6 @@ public class ModList {
 		String entry = infoIgnoreShaders.get(idx);
 		return entry;
 	}
-
-	/**
-	 * Searches through a directory and its sub-directories, then sets up a new mod list.
-	 * @param name = name of file to find.
-	 * @param file = directory to search.
-	 */
-	public boolean findFile(String name, File file)
-    {
-		boolean fileFound = false;
-        list = file.listFiles();
-        if(list != null)
-        for(File fil : list)
-        {
-            if(fil.isDirectory())
-            {
-                findFile(name,fil);
-            }
-            else if(name.equalsIgnoreCase(fil.getName()))
-            {
-            	Log.info("\tFound file: " + fil);
-            	fileFound = true;
-            }
-        }
-        return fileFound;
-    }
 	
 	/**
 	 * Adds the file path to a mod to the index list.
@@ -173,21 +155,31 @@ public class ModList {
 	{
 		String launchPath = filePath;
 		index.add(launchPath);
-		Log.info("Adding flag to list.");// + filePath);
+		Log.info("Adding flag to list.");
 	}
 	
 	/**
 	 * Adds all of a mod's information available to their respective lists.
 	 */
-	private void addModInfo()
-	{		
-		infoTitle.add(modTitle);
-		infoAuthor.add(modAuthor);
-		infoDescription.add(modDesc);
-		infoMinCompatibility.add(modMinVer);
-		infoCustomShaders.add(modShader);
-		infoCustomExecName.add(modExecName);
-		infoIgnoreShaders.add(modIgnoreShaders);
+	public static void addModInfo(List<String> list)
+	{
+		if(list == null) {
+			infoTitle.add(modTitle);
+			infoAuthor.add(modAuthor);
+			infoDescription.add(modDesc);
+			infoMinCompatibility.add(modMinVer);
+			infoCustomShaders.add(modShader);
+			infoCustomExecName.add(modExecName);
+			infoIgnoreShaders.add(modIgnoreShaders);			
+		} else {
+			infoTitle.add(list.get(0));
+			infoAuthor.add(list.get(1));
+			infoDescription.add(list.get(3));
+			infoMinCompatibility.add(list.get(4));
+			infoCustomShaders.add(list.get(5));
+			infoCustomExecName.add(list.get(7));
+			infoIgnoreShaders.add(list.get(6));
+		}
 		
 		Log.info("Adding information to list at index: " + modsFoundTotal);
 	}
@@ -209,7 +201,6 @@ public class ModList {
 	 * @param fil = The File object (path) of an already found main_init file.
 	 */
 	public ModList(File fil) {
-		Log.info("Found game file: " + fil);
 		
 		filePath = fil.getPath();
 		this.addLaunchIndex();
@@ -220,53 +211,47 @@ public class ModList {
 		modIcon = "";
 		modDesc = "No description.";
 		modMinVer = "Undefined";
-		modShader = "Undefined";
+		modShader = "No";
 		modExecName = null;
 		modIgnoreShaders = "false";
-				
-		TableItem modItem = new TableItem(MainFrame.tableMods, SWT.NONE);
-		modItem.setFont(SWTResourceManager.getFont("System", 11, SWT.NORMAL));
 		
 		try {
 			String cfgName = "modloader.cfg";
 			String cfgNameLegacy = "aml.cfg";
 			String cfgPath = fil.getParent().toString();
 			
-			boolean found = findFile(cfgName, new File(cfgPath));
-			if(!found) findFile(cfgNameLegacy, new File(cfgPath));
-
-			inputInit = new FileInputStream(fil);
+			FindFile.found = false;			
 			
-			try {
-				if(found) inputCFG = new FileInputStream(cfgPath + File.separator + cfgName);
-				else inputCFG = new FileInputStream(cfgPath + File.separator + cfgNameLegacy);
+			//Check if this mod has an accompanying modloader.cfg or aml.cfg file. If so, set cfgFound to true.
+			File cfgML = new File(cfgPath + File.separator + cfgName);
+			if(!cfgML.exists()) cfgML = new File(cfgPath + File.separator + cfgNameLegacy);
+			if(cfgML.exists()) {
+				inputCFG = new FileInputStream(cfgML);
 				cfgFound = true;
-			} catch (FileNotFoundException e) {
-				Log.warn("Could not find modloader.cfg or aml.cfg. Oh well.");
-			}
+				Log.info("\tFound modloader.cfg or aml.cfg.");
+			} else Log.warn("\tCould not find modloader.cfg or aml.cfg. Oh well.");
 			
 			try {
+				inputInit = new FileInputStream(fil);
 				mainInit.load(inputInit);
 				modTitle = mainInit.getProperty("GameName").replace("\"", "");
 				Log.info("\t\tGameName \t= " + modTitle);
 			} catch (Exception e) {
 				modTitle = "Untitled";
 				Log.warn("GameName not found. Mod incomplete?");
-				modItem.setFont(SWTResourceManager.getFont("System", 11, SWT.ITALIC));
+				Log.error(e);
 			}
 			
 			File f = new File(fil.getParent());
 			f = new File(f.getParent() + File.separator + "shaders");
-
-			if(f.isDirectory()) {
-				modShader = "Yes";
-			} else modShader = "No";
+			if(f.isDirectory()) modShader = "Yes";
 			
 			if(cfgFound) {
 				cfg.load(inputCFG);
 				if(cfg.getProperty("Author") != null) modAuthor = cfg.getProperty("Author"); 
 				if(cfg.getProperty("IconFile") != null) modIcon = cfg.getProperty("IconFile"); 
-				if(cfg.getProperty("Description") != null) modDesc = cfg.getProperty("Description").replace("â", "'");
+				if(cfg.getProperty("Description") != null) modDesc = cfg.getProperty("Description").replace("â", "'"); //Patch odd formatting
+				
 				try {
 					if(cfg.getProperty("MinVersion") != null) modMinVer = ""+Float.parseFloat(cfg.getProperty("MinVersion")); 
 				} catch (NumberFormatException e) {
@@ -287,32 +272,31 @@ public class ModList {
 			}
 			Log.info("\t\tCustomShaders \t= " + modShader);
 			
-			this.addModInfo();
-			modItem.setText(this.getModTitle());
+			addModInfo(null);
 			
-			try {
-				File iconFile = new File(cfgPath + File.separator + modIcon);
-				
-				if(iconFile.exists())
-				{
-					//scale the image to specified size.
-					Image image = new Image(Display.getDefault(), iconFile.toString());
-					modItem.setImage(Common.scale(image, MainFrame.getIconSize()));
-					
-				} else {
-					Log.warn("Icon file not found. Using default.");
-					modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrame.class, defIcon), MainFrame.getIconSize()));
-				}
-				
-			} catch(NullPointerException e) {
-				Log.error("\t\tFailed adding icon: " + cfgPath + File.separator + modIcon);
-				Log.error(e);
-			} catch(Exception e) {				
-				modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrame.class, defIcon), MainFrame.getIconSize()));
-			}
-			
+			File iconFile = new File(cfgPath + File.separator + modIcon);
+			listIcon.add(iconFile);
+						
 			modsFoundTotal += 1;
-			listDataArr.add(modItem);
+			
+			MainFrame.getDisplay().syncExec(new Runnable() {
+				public void run() {
+					MainFrame.modItem = new TableItem(MainFrame.tableMods, SWT.NONE);
+					MainFrame.modItem.setFont(SWTResourceManager.getFont("System", 11, SWT.NORMAL));
+					MainFrame.modItem.setText(modTitle);
+					if(iconFile.exists() && iconFile.isFile()) {
+						Log.info("Applying icon: " + iconFile.toString());
+						Image image = new Image(Display.getDefault(), iconFile.toString());
+						MainFrame.modItem.setImage(Common.scale(image, MainFrame.getIconSize()));						
+					} else {
+						Log.warn("Icon file not found. Using default.");
+						MainFrame.modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrame.class, defIcon), MainFrame.getIconSize()));
+					}
+					listDataArr.add(MainFrame.modItem);
+					MainFrame.labelModAmount.setText(""+modsFoundTotal);
+				}
+			});
+			
 			Log.info("Adding mod to list: " + this.getModTitle());
 			
 		} catch (IOException e) {
@@ -329,5 +313,4 @@ public class ModList {
 			}
 		}
 	}
-
 }

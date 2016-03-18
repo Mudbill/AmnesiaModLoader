@@ -33,10 +33,12 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import de.ikoffice.widgets.SplitButton;
 
+import org.eclipse.swt.widgets.ProgressBar;
+
 public class MainFrame {
 	
 	private final static String appName = "Amnesia Modloader";
-	private final static String appVersion = "1.4.3";
+	private final static String appVersion = "1.5.0";
 	private final static String cfgName = "main_init.cfg";
 	
 	private static String modDirectory = "";
@@ -45,12 +47,12 @@ public class MainFrame {
 	private static boolean warnExec = true, warnShader = true;
 
 	private static List<String> shadersList = new ArrayList<String>();
-	private static ModList modList;
-	private static Refresh refresh = new Refresh();
-	private File[] list;
+	private static ModList modList = new ModList();
 	public static boolean useSameDir = true;
 	public static boolean refreshBoot = false;
 	public static boolean startGame = false;
+	public static boolean useCache = false;
+	public static boolean abortRefresh = false;
 	
 	//Components
 	private static Display display = Display.getDefault();
@@ -59,20 +61,26 @@ public class MainFrame {
 	private static Shell shell;
 	public static Composite rightPanel, leftPanel;
 	public static Table tableMods;
-	private static Button buttonRefresh, buttonFolder, buttonPrefs, buttonLaunch, buttonQuit, buttonLaunch2;
+	public static TableItem modItem;
+	private static Button buttonFolder, buttonPrefs, buttonLaunch, buttonQuit, buttonLaunch2;
+	public static Button buttonRefresh, buttonRefreshCancel;
 	private static TableColumn columnMods;
-	private static Label labelShader, labelShaderVal, sep, labelModsFound, labelModAmount;
+	private static Label labelShader, labelShaderVal, sep, labelModsFound;
+	public static Label labelModAmount;
 	private static MenuItem menuItemLauncher, menuItemGame;
 	private static FormData 	fd_buttonRefresh, fd_buttonFolder, fd_buttonPrefs, fd_buttonLaunch, fd_buttonQuit,
-								fd_rightPanel, fd_leftPanel, fd_tableMods, fd_labelModAmount, fd_labelModsFound, fd_sep, fd_buttonLaunch2;
+								fd_rightPanel, fd_leftPanel, fd_tableMods, fd_labelModAmount, fd_labelModsFound, fd_sep, 
+								fd_progressBar;
 	private Menu menuList;
+	public static ProgressBar progressBar, progressBarInf;
+	private static int progressMax;
 	
 	public static int getIconSize() {
 		int i = 48;
 		
-		Properties p = ConfigManager.loadConfig(Preferences.prefPath);
-
 		try {
+			Properties p = ConfigManager.loadConfig(Preferences.prefPath);
+
 			int i2 = Integer.parseInt(p.getProperty("IconSize"));
 
 			switch(i2) {
@@ -96,6 +104,11 @@ public class MainFrame {
 			Log.error("Could not get and scale image.");
 		}
 		return i;
+	}
+	
+	public static Display getDisplay()
+	{
+		return MainFrame.display;
 	}
 	
 	public static Table getTable()
@@ -180,44 +193,25 @@ public class MainFrame {
 			}
 		}
 	}
-	
-	/**
-	 * Searches through a directory and its sub-directories, then sets up a new mod list.
-	 * @param name = name of file to find.
-	 * @param file = directory to search.
-	 */
-	public void findFile(String name, File file)
-    {
-        list = file.listFiles();
-        if(list != null)
-        for (File fil : list)
-        {
-            if (fil.isDirectory())
-            {
-                findFile(name,fil);
-            }
-            else if (name.equalsIgnoreCase(fil.getName()))
-            {
-            	modList = new ModList(fil);
-            }
-        }
-    }
-	
+		
 	/**
 	 * Searches specified directories and sub-directories for a file named "main_init.cfg"
 	 */
 	public void checkMods()
-	{
+	{			
 		try {
+			new FindFile(display, progressBar, new File(modDirectory), cfgName).start();
+
+			if(display.isDisposed()) return;
 			if(modDirectory != null) {
-				findFile(cfgName, new File(modDirectory));
-				labelModAmount.setText(""+modList.getModsFound());
+				progressBarInf.setVisible(false);
+				progressBar.setVisible(true);
+				progressMax = new File(modDirectory).listFiles().length;
+				progressBar.setMaximum(progressMax);
 				Log.info("Mods found: " + modList.getModsFound());
 			}
 		} catch (Exception e) {
 			Log.error("Failed checking for mods.");			
-			Log.error(e);
-			
 		}
 	}
 	
@@ -255,12 +249,11 @@ public class MainFrame {
 			} catch (Exception e) {
 				Log.error("Failed displaying mod info.");
 				
-				MessageBox m = new MessageBox(shell, SWT.SHEET | SWT.ICON_ERROR);
-				m.setMessage("An unexpected error occurred while displaying mod info. It probably tried displaying info that doesn't exist because it failed searching for mods. This could be an issue on my part.\nI'm sorry D:");
-				m.setText("Error");
-				m.open();
-				
-				Log.error(e);
+//				MessageBox m = new MessageBox(shell, SWT.SHEET | SWT.ICON_ERROR);
+//				m.setMessage("An unexpected error occurred while displaying mod info. It probably tried displaying info that doesn't exist because it failed searching for mods. This could be an issue on my part.\nI'm sorry D:");
+//				m.setText("Error");
+//				m.open();		
+//				Log.error(e);
 			}
 			labelTitle.setText(title);
 			labelAuthor.setText(author);
@@ -338,6 +331,7 @@ public class MainFrame {
 				
 			gameDirectory = p.getProperty("GameDir");
 			refreshBoot = Boolean.parseBoolean(p.getProperty("RefreshOnStartup"));
+			useCache = Boolean.parseBoolean(p.getProperty("UseCache"));
 			startGame = Boolean.parseBoolean(p.getProperty("PrimaryGame"));
 			setWarnExec(Boolean.parseBoolean(p.getProperty("WarnExec")));
 			setWarnShader(Boolean.parseBoolean(p.getProperty("WarnShader")));
@@ -352,11 +346,25 @@ public class MainFrame {
 		buttonRefresh.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				refresh = new Refresh();
-				refresh.refreshList();
+				abortRefresh = false;
+				new Refresh().refreshList();
 			}
 		});
-		
+
+		buttonRefreshCancel = new Button(shell, SWT.NONE);
+		buttonRefreshCancel.setLayoutData(new FormData());
+		buttonRefreshCancel.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		buttonRefreshCancel.setText("Cancel");
+		buttonRefreshCancel.setVisible(false);
+		buttonRefreshCancel.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				abortRefresh = true;
+				buttonRefreshCancel.setVisible(false);
+				buttonRefresh.setVisible(true);
+			}
+		});
+
 		buttonFolder = new Button(shell, SWT.NONE);
 		buttonFolder.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		buttonFolder.setText("Open mods folder");
@@ -371,17 +379,6 @@ public class MainFrame {
 				} catch (IOException e) {
 					Log.error(e);
 				}
-			}
-		});
-		
-		buttonPrefs = new Button(shell, SWT.NONE);
-		buttonPrefs.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-		buttonPrefs.setText("Preferences");
-		buttonPrefs.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				Preferences prefs = new Preferences(shell, SWT.SHEET);
-				prefs.open();
 			}
 		});
 		
@@ -402,7 +399,7 @@ public class MainFrame {
 		buttonLaunch2.setLayoutData(new FormData());
 		buttonLaunch2.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 		buttonLaunch2.setText("Launch mod");
-		shell.setDefaultButton(buttonLaunch);
+		buttonLaunch2.setVisible(false);
 		buttonLaunch2.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
@@ -416,9 +413,10 @@ public class MainFrame {
 				launchMod(CurrentOS.getGameExe());
 			}
 		});
-		buttonLaunch2.setVisible(false);
-		
+
 		buttonQuit = new Button(shell, SWT.NONE);
+		buttonQuit.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		buttonQuit.setText("Quit");
 		buttonQuit.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
@@ -429,8 +427,17 @@ public class MainFrame {
 				}
 			}
 		});
-		buttonQuit.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-		buttonQuit.setText("Quit");
+		
+		buttonPrefs = new Button(shell, SWT.NONE);
+		buttonPrefs.setBackground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		buttonPrefs.setText("Preferences");
+		buttonPrefs.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				Preferences prefs = new Preferences(shell, SWT.SHEET);
+				prefs.open();
+			}
+		});
 		
 		rightPanel = new Composite(shell, SWT.BORDER);
 		rightPanel.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
@@ -502,10 +509,6 @@ public class MainFrame {
 		labelModAmount.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		labelModAmount.setText("0");
 		
-		if(refreshBoot) {
-			refresh.refreshList();
-		}
-		
 		menuList = new Menu(tableMods);
 		tableMods.setMenu(menuList);
 		
@@ -528,6 +531,14 @@ public class MainFrame {
 				launchMod(CurrentOS.getGameExe());
 			}
 		});
+		
+		progressBar = new ProgressBar(shell, SWT.SMOOTH);
+		progressBar.setVisible(false);
+		progressBar.setMaximum(2000);
+		
+		progressBarInf = new ProgressBar(shell, SWT.INDETERMINATE);
+		progressBarInf.setLayoutData(new FormData());
+		progressBarInf.setVisible(false);
 
 		//Design setup
 		fd_tableMods = new FormData();
@@ -582,12 +593,6 @@ public class MainFrame {
 		fd_buttonLaunch.left = new FormAttachment(buttonFolder, 108);
 		fd_buttonLaunch.right = new FormAttachment(buttonQuit, -6);
 		buttonLaunch.setLayoutData(fd_buttonLaunch);
-		fd_buttonLaunch2 = new FormData();
-		fd_buttonLaunch2.bottom = new FormAttachment(100, -10);
-		fd_buttonLaunch2.top = new FormAttachment(leftPanel, 6);
-		fd_buttonLaunch2.left = new FormAttachment(buttonFolder, 108);
-		fd_buttonLaunch2.right = new FormAttachment(buttonQuit, -6);
-		buttonLaunch2.setLayoutData(fd_buttonLaunch2);
 		fd_buttonQuit = new FormData();
 		fd_buttonQuit.bottom = new FormAttachment(100, -10);
 		fd_buttonQuit.top = new FormAttachment(rightPanel, 6);
@@ -600,6 +605,25 @@ public class MainFrame {
 		fd_rightPanel.left = new FormAttachment(100, -353);
 		fd_rightPanel.right = new FormAttachment(100, -10);
 		rightPanel.setLayoutData(fd_rightPanel);
+		fd_progressBar = new FormData();
+		fd_progressBar.right = new FormAttachment(buttonPrefs, 0, SWT.RIGHT);
+		fd_progressBar.top = new FormAttachment(0, 12);
+		fd_progressBar.left = new FormAttachment(buttonRefresh, 6);
+		fd_progressBar.bottom = new FormAttachment(0, 33);
+		progressBar.setLayoutData(fd_progressBar);
+		
+		buttonRefreshCancel.setLayoutData(fd_buttonRefresh);
+		buttonLaunch2.setLayoutData(fd_buttonLaunch);
+		progressBarInf.setLayoutData(fd_progressBar);
+		
+		if(useCache) {
+			new ModCache().loadCache();
+		}
+		
+		if(refreshBoot) {
+			abortRefresh = false;
+			new Refresh().refreshList();
+		}
 	}
 	
 	/**
@@ -701,13 +725,14 @@ public class MainFrame {
 				m.open();
 			}
 			
-		} catch (NullPointerException e) {
+		} catch (ArrayIndexOutOfBoundsException e) {
 			Log.error("No selected index!");
 			MessageBox m = new MessageBox(shell, SWT.SHEET | SWT.OK | SWT.ICON_ERROR);
 			m.setMessage("No mod selected to launch.");
 			m.setText("Could not start");
 			m.open();
-			//Log.error(e);
+		} catch (NullPointerException e) {
+			Log.error(e);
 		}
 	}
 }

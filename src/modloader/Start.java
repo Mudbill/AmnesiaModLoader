@@ -22,8 +22,7 @@ public class Start {
 		try {
 			Log.info("Starting Amnesia Modloader version " + MainFrame.getVersion());
 			
-			CurrentOS currentOS = new CurrentOS();
-			currentOS.setOSValues();
+			new CurrentOS().setOSValues();
 
 			String prefPath = CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName();
 			String portPath = CurrentOS.getSaveDir() + File.separator + CurrentOS.getPortConfigName();
@@ -117,7 +116,7 @@ public class Start {
 		if(m.open() == SWT.YES) {
 			try {
 				Files.copy(Start.class.getResourceAsStream("/resources/modloader.cfg"), Paths.get(rootCfg.getPath()), StandardCopyOption.REPLACE_EXISTING);
-				Files.copy(Start.class.getResourceAsStream("/resources/default.png"), Paths.get(rootCfg.getParent() + File.separator + "default.png"), StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(Start.class.getResourceAsStream("/resources/icon_default.png"), Paths.get(rootCfg.getParent() + File.separator + "default.png"), StandardCopyOption.REPLACE_EXISTING);
 				Log.info("\tCopied files from jar to config folder.");						
 			} catch (IOException e) {
 				Log.error(e);

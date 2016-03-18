@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.TableItem;
 
 public class Refresh {
@@ -42,20 +41,16 @@ public class Refresh {
 	public void refreshList() {
 		if(MainFrame.getModDirectory() != null || !MainFrame.getModDirectory().equals("")) {
 			
-			RefreshDialog dialog = new RefreshDialog(MainFrame.getShell(), SWT.SHEET);
-			dialog.open();
-			
 			Properties p = ConfigManager.loadConfig(Preferences.prefPath);
-			if(Boolean.parseBoolean(p.getProperty("UseSameDir")) == true) {
-				MainFrame.setModDirectory(p.getProperty("GameDir"));				
-				Log.info("UseSameDir == true");
-			} 
-			else {
-				MainFrame.setModDirectory(p.getProperty("ModDir"));
-				Log.info("UseSameDir == false");
-			}
+			if(Boolean.parseBoolean(p.getProperty("UseSameDir")) == true) 
+				 MainFrame.setModDirectory(p.getProperty("GameDir"));				
+			else MainFrame.setModDirectory(p.getProperty("ModDir"));
 			
 			try {
+				MainFrame.buttonRefresh.setVisible(false);
+				MainFrame.buttonRefreshCancel.setVisible(true);
+				MainFrame.progressBarInf.setVisible(true);
+				MainFrame.progressBar.setSelection(0);
 				try {
 					modList.resetList();
 				} catch (Exception e) {
@@ -68,25 +63,20 @@ public class Refresh {
 					Log.error("Failed checkMods()");
 					Log.error(e);
 				}
-								
 				try {
 					setupNewList();
 				} catch (Exception e) {
 					Log.error("Failed setupNewList()");
 					Log.error(e);
 				}
-				try {
-					MainFrame.displayModInfo();
-				} catch (Exception e) {
-					Log.error("Failed displayModInfo()");
-					Log.error(e);
-				}
+				ModCache.cacheChanged = true;
 			} catch (Exception e) {
 				Log.error("Failed to refresh list.");
-				dialog.close();
+				Log.error(e);
 			}
-			
-			dialog.close();
+		} else {
+			Log.error("ModDir is empty!");
 		}
+		MainFrame.abortRefresh = false;
 	}
 }

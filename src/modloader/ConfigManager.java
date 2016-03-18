@@ -22,6 +22,7 @@ public class ConfigManager {
 	 */
 	public static Properties loadConfig(String filePath) {
 		try {
+			//Log.info("Loading config: " + filePath);
 			inputStream = new FileInputStream(filePath);
 			properties.load(inputStream);
 		} catch (FileNotFoundException e) {
@@ -50,6 +51,7 @@ public class ConfigManager {
 	 */
 	public static void writeConfig(Properties properties, String filePath) {
 		try {
+			Log.info("Writing config to: " + filePath);
 			properties.store(new FileOutputStream(filePath), null);
 		} catch (IOException e) {
 			Log.error("Could not write config file: " + filePath);

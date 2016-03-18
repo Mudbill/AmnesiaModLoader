@@ -108,6 +108,10 @@ public class CurrentOS {
 				return false;
 			}
 		}
+		
+		if(MainFrame.useCache) {
+			new ModCache().writeCache();			
+		}
 		Log.info("Closing application.");
 		return true;
 	}

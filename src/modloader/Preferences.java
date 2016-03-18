@@ -40,7 +40,8 @@ public class Preferences extends Dialog {
 	
 	private Object result;
 	private Shell shell;
-	private Button buttonBrowseGame, radioUseSame, radioUseCustom, buttonBrowseMod, buttonCancel, buttonOK, buttonRefreshBoot, buttonWeb, radioLauncher, radioGame, buttonMinimize, buttonApplyShader, buttonYoutube, buttonTwitter, buttonForum, buttonWarnings;
+	private Button buttonBrowseGame, radioUseSame, radioUseCustom, buttonBrowseMod, buttonCancel, buttonOK, buttonRefreshBoot, buttonWeb, 
+		radioLauncher, radioGame, buttonMinimize, buttonApplyShader, buttonYoutube, buttonTwitter, buttonForum, buttonWarnings, buttonCache, buttonClearCache;
 	private Text textGameDir, textModDir;
 	private TabFolder tabFolder;
 	private TabItem tabGeneral, tabAbout;
@@ -81,12 +82,12 @@ public class Preferences extends Dialog {
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle());
 		shell.setImage(SWTResourceManager.getImage(Preferences.class, "/resources/icon_preferences.png"));
-		shell.setSize(560, 469);
+		shell.setSize(560, 500);
 		shell.setText("Preferences");
 		shell.setLayout(null);
 		
 		tabFolder = new TabFolder(shell, SWT.NONE);
-		tabFolder.setBounds(10, 10, 534, 391);
+		tabFolder.setBounds(10, 10, 534, 423);
 		
 		panelGeneral = new Composite(tabFolder, SWT.NONE);
 		panelGeneral.setLayout(null);
@@ -119,7 +120,7 @@ public class Preferences extends Dialog {
 		labelAuthor.setText("Developed by Mudbill");
 		
 		buttonWeb = new Button(panelAbout, SWT.NONE);
-		buttonWeb.setBounds(10, 268, 250, 55);
+		buttonWeb.setBounds(10, 300, 250, 55);
 		buttonWeb.setToolTipText(urlWeb);
 		buttonWeb.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		buttonWeb.setText("View online page");
@@ -136,7 +137,7 @@ public class Preferences extends Dialog {
 		
 		buttonForum = new Button(panelAbout, SWT.NONE);
 		buttonForum.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		buttonForum.setBounds(266, 268, 250, 55);
+		buttonForum.setBounds(266, 300, 250, 55);
 		buttonForum.setText("View forum thread");
 		buttonForum.setToolTipText(urlForum);
 		buttonForum.addSelectionListener(new SelectionAdapter() {
@@ -153,7 +154,7 @@ public class Preferences extends Dialog {
 		buttonTwitter = new Button(panelAbout, SWT.NONE);
 		buttonTwitter.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		buttonTwitter.setImage(SWTResourceManager.getImage(Preferences.class, "/resources/icon_twitter.png"));
-		buttonTwitter.setBounds(458, 329, 26, 26);
+		buttonTwitter.setBounds(458, 361, 26, 26);
 		buttonTwitter.setToolTipText(urlTwitter);
 		buttonTwitter.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -169,7 +170,7 @@ public class Preferences extends Dialog {
 		buttonYoutube = new Button(panelAbout, SWT.NONE);
 		buttonYoutube.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		buttonYoutube.setImage(SWTResourceManager.getImage(Preferences.class, "/resources/icon_youtube.png"));
-		buttonYoutube.setBounds(490, 329, 26, 26);
+		buttonYoutube.setBounds(490, 361, 26, 26);
 		buttonYoutube.setToolTipText(urlYoutube);
 		buttonYoutube.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -183,18 +184,18 @@ public class Preferences extends Dialog {
 		});
 		
 		labelPromo = new Label(panelAbout, SWT.NONE);
-		labelPromo.setBounds(10, 336, 172, 13);
+		labelPromo.setBounds(10, 368, 172, 13);
 		labelPromo.setText("You can find me here:");
 		
 		labelEmail = new Label(panelAbout, SWT.NONE);
 		labelEmail.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.ITALIC));
 		labelEmail.setAlignment(SWT.RIGHT);
-		labelEmail.setBounds(300, 333, 152, 17);
+		labelEmail.setBounds(300, 365, 152, 17);
 		labelEmail.setText("mudbill@buttology.net");
 		
 		ScrolledComposite scrolledComposite = new ScrolledComposite(panelAbout, SWT.BORDER | SWT.V_SCROLL);
 		scrolledComposite.setExpandVertical(true);
-		scrolledComposite.setBounds(10, 52, 506, 210);
+		scrolledComposite.setBounds(10, 52, 506, 242);
 		scrolledComposite.setExpandHorizontal(true);
 		
 		ShellAbout shellAbout = new ShellAbout(scrolledComposite, SWT.NONE);
@@ -236,6 +237,11 @@ public class Preferences extends Dialog {
 		radioUseCustom = new Button(groupDir, SWT.RADIO);
 		radioUseCustom.setBounds(23, 114, 138, 16);
 		radioUseCustom.setText("Use custom:");
+		
+		textModDir = new Text(groupDir, SWT.BORDER);
+		textModDir.setBounds(13, 136, 393, 23);
+		textModDir.setEnabled(false);
+		textModDir.setToolTipText("The folder you wish to search for mods in. Selecting a larger directory will increase the load time!");
 
 		buttonBrowseMod = new Button(groupDir, SWT.NONE);
 		buttonBrowseMod.setBounds(412, 135, 84, 25);
@@ -285,25 +291,33 @@ public class Preferences extends Dialog {
 				}
 			}
 		});
-		
-		textModDir = new Text(groupDir, SWT.BORDER);
-		textModDir.setBounds(13, 136, 393, 23);
-		textModDir.setEnabled(false);
-		textModDir.setToolTipText("The folder you wish to search for mods in. Selecting a larger directory will increase the load time!");
 
 		groupMisc = new Group(panelGeneral, SWT.NONE);
-		groupMisc.setBounds(10, 193, 320, 162);
-		groupMisc.setText("Miscellaneous");
+		groupMisc.setBounds(10, 193, 320, 194);
+		groupMisc.setText("Options");
 		groupMisc.setLayout(null);
 		
+		buttonCache = new Button(groupMisc, SWT.CHECK);
+		buttonCache.setToolTipText("If the Modloader should save a cache of the last list shown, \r\nand load it upon next start. This will immediately show the mods in the list, \r\nbut the information might be out-of-date if you've made changes to your directory.");
+		buttonCache.setBounds(13, 24, 162, 16);
+		buttonCache.setText("Use cached list on startup");
+		
 		buttonRefreshBoot = new Button(groupMisc, SWT.CHECK);
-		buttonRefreshBoot.setToolTipText("Whether the Modloader should automatically refresh the mod list when starting.");
-		buttonRefreshBoot.setBounds(13, 24, 134, 16);
-		buttonRefreshBoot.setSelection(true);
+		buttonRefreshBoot.setToolTipText("If the Modloader should automatically refresh the mod list when starting. Startup will be slower.");
+		buttonRefreshBoot.setBounds(23, 46, 134, 16);
 		buttonRefreshBoot.setText("Update list on startup");
+		buttonRefreshBoot.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				if(buttonRefreshBoot.getSelection()) {
+					buttonCache.setSelection(false);
+					buttonCache.setEnabled(false);
+				} else buttonCache.setEnabled(true);
+			}
+		});
 
 		groupIcon = new Group(panelGeneral, SWT.NONE);
-		groupIcon.setBounds(336, 193, 180, 162);
+		groupIcon.setBounds(336, 193, 180, 194);
 		groupIcon.setText("Icon size");
 		groupIcon.setLayout(null);
 		
@@ -347,39 +361,39 @@ public class Preferences extends Dialog {
 				}
 			}
 		});
-		
-		labelPrimary = new Label(groupMisc, SWT.NONE);
-		labelPrimary.setBounds(13, 90, 134, 15);
-		labelPrimary.setText("Primary launch option:");
-		radioLauncher = new Button(groupMisc, SWT.RADIO);
-		radioLauncher.setBounds(23, 111, 70, 16);
-		radioLauncher.setText("Launcher");
-		radioGame = new Button(groupMisc, SWT.RADIO);
-		radioGame.setBounds(23, 133, 85, 16);
-		radioGame.setText("Direct game");
 		buttonMinimize = new Button(groupMisc, SWT.CHECK);
-		buttonMinimize.setToolTipText("Whether the Modloader should minimize after starting a mod.");
-		buttonMinimize.setBounds(13, 46, 202, 16);
+		buttonMinimize.setToolTipText("If the Modloader should minimize the window after starting a mod.");
+		buttonMinimize.setBounds(13, 68, 202, 16);
 		buttonMinimize.setText("Minimize Modloader on mod start");
 		buttonApplyShader = new Button(groupMisc, SWT.CHECK);
-		buttonApplyShader.setToolTipText("Whether the Modloader should automatically install custom shaders when starting a mod. It will also uninstall the shaders when done.");
-		buttonApplyShader.setBounds(13, 68, 273, 16);
+		buttonApplyShader.setToolTipText("If the Modloader should automatically install custom shaders when starting a mod. It will also uninstall the shaders when done.");
+		buttonApplyShader.setBounds(13, 90, 273, 16);
 		buttonApplyShader.setText("Apply custom shaders upon launch (if available)");
 		buttonApplyShader.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				if(buttonApplyShader.getSelection()) {
 					MessageBox m = new MessageBox(shell, SWT.SHEET | SWT.OK | SWT.ICON_WARNING);
-					m.setMessage("WARNING: This is currently an experimental feature. This means that, although everything should work fine, I have not tested it enough to confirm this. It will modify some files in your Amnesia directory. Although it creates a backup, I recommend you create one yourself in case of malfunction. The folder that is modified is named \"shaders\" and the backup name will be \"shaders_backup\". Other files are left alone.\n\nIf you find an issue, please report it to me so I can fix it, but keep in mind that you're on your own if things go wrong.");
+					m.setMessage("Disclaimer:\nThis is currently an experimental feature. This means that, although everything should work fine, I have not tested it enough to confirm this. It will modify some files in your Amnesia directory. It creates a backup, but I recommend you create one yourself in case of malfunction. The folder that is modified is named \"shaders\" and the backup name will be \"shaders_backup\". Other files are left alone.\n\nIf you find an issue, please report it to me so I can fix it, but keep in mind that you're on your own if things go wrong.");
 					m.setText("Beta Feature");
 					m.open();
 				}
 			}
 		});
 		
+		labelPrimary = new Label(groupMisc, SWT.NONE);
+		labelPrimary.setBounds(10, 125, 134, 15);
+		labelPrimary.setText("Primary launch option:");
+		radioLauncher = new Button(groupMisc, SWT.RADIO);
+		radioLauncher.setBounds(20, 146, 70, 16);
+		radioLauncher.setText("Launcher");
+		radioGame = new Button(groupMisc, SWT.RADIO);
+		radioGame.setBounds(20, 168, 85, 16);
+		radioGame.setText("Direct game");
+		
 		buttonWarnings = new Button(groupMisc, SWT.NONE);
 		buttonWarnings.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		buttonWarnings.setBounds(225, 130, 85, 23);
+		buttonWarnings.setBounds(225, 161, 85, 23);
 		buttonWarnings.setText("Warnings");
 		buttonWarnings.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -389,84 +403,33 @@ public class Preferences extends Dialog {
 			}
 		});
 		
+		buttonClearCache = new Button(groupMisc, SWT.NONE);
+		buttonClearCache.setEnabled(false);
+		buttonClearCache.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+		buttonClearCache.setBounds(225, 21, 85, 23);
+		buttonClearCache.setText("Clear cache");
+		buttonClearCache.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				Log.info("Clearing cache via preferences.");
+				new ModCache().clearCache();
+				buttonClearCache.setEnabled(false);
+			}
+		});
+		
 		buttonOK = new Button(shell, SWT.NONE);
-		buttonOK.setBounds(378, 407, 80, 23);
+		buttonOK.setBounds(378, 439, 80, 23);
 		buttonOK.setText("Save");
 		shell.setDefaultButton(buttonOK);
 		buttonOK.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				if(MainFrame.getModDirectory() != null) {
-					boolean firstTime = false;
-					if(!new File(prefPath).exists()) firstTime = true;
-					
-					String modDir = textModDir.getText();
-					String gameDir = textGameDir.getText();
-
-					Properties p = new Properties();
-
-					if(buttonRefreshBoot.getSelection()) {
-						p.setProperty("RefreshOnStartup", "true");
-					} else p.setProperty("RefreshOnStartup", "false");
-
-					if(radioUseSame.getSelection()) {
-						p.setProperty("UseSameDir", "true");
-						MainFrame.useSameDir = true;
-					} else {
-						p.setProperty("UseSameDir", "false");
-						MainFrame.useSameDir = false;
-					}
-
-					if(radioGame.getSelection()) {
-						p.setProperty("PrimaryGame", "true");
-						MainFrame.startGame = true;
-					} else {
-						p.setProperty("PrimaryGame", "false");
-						MainFrame.startGame = false;
-					}
-
-					if(buttonMinimize.getSelection()) {
-						p.setProperty("Minimize", "true");
-					} else p.setProperty("Minimize", "false");
-					
-					if(buttonApplyShader.getSelection()) {
-						p.setProperty("ApplyShaders", "true");
-					} else p.setProperty("ApplyShaders", "false");
-
-					p.setProperty("IconSize", ""+slider.getSelection());
-					p.setProperty("ModDir", modDir);
-					p.setProperty("GameDir", gameDir);
-					p.setProperty("WarnExec", ""+warnExec);
-					p.setProperty("WarnShader", ""+warnShader);
-					MainFrame.setModDirectory(modDir);
-					MainFrame.setGameDirectory(gameDir);
-					MainFrame.setWarnExec(warnExec);
-					MainFrame.setWarnShader(warnShader);
-
-					ConfigManager.writeConfig(p, prefPath);
-					Log.info("Printing settings file to: " + prefPath);
-					
-					if(!new File(portPath).exists()) {
-						Properties p2 = new Properties();
-						p2.setProperty("Port", "9999");
-						ConfigManager.writeConfig(p2, prefPath);
-						Log.info("Writing default port settings.");
-					}
-					
-					shell.close();
-					
-					if(firstTime) {
-						Start.checkConfigFolder(new File(gameDir + File.separator + "config" + File.separator + "modloader.cfg"));
-						MainFrame frame = new MainFrame();
-						frame.open();
-						firstTime = false;
-					}
-				}
+				acceptPrefs();
 			}
 		});
 		
 		buttonCancel = new Button(shell, SWT.NONE);
-		buttonCancel.setBounds(464, 407, 80, 23);
+		buttonCancel.setBounds(464, 439, 80, 23);
 		buttonCancel.setText("Cancel");
 		buttonCancel.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -476,6 +439,12 @@ public class Preferences extends Dialog {
 				shell.close();
 			}
 		});
+		loadData();
+	}
+	
+	private void loadData()
+	{
+		if(new ModCache().checkCache()) buttonClearCache.setEnabled(true);
 		
 		Properties p = ConfigManager.loadConfig(prefPath);
 
@@ -491,6 +460,7 @@ public class Preferences extends Dialog {
 			boolean minimize;
 			boolean primaryGame;
 			boolean shader;
+			boolean cache;
 			int sliderVal;
 			String modDir;
 			String gameDir;
@@ -505,10 +475,16 @@ public class Preferences extends Dialog {
 			sliderVal = Integer.parseInt(p.getProperty("IconSize"));
 			warnExec = Boolean.parseBoolean(p.getProperty("WarnExec"));
 			warnShader = Boolean.parseBoolean(p.getProperty("WarnShader"));
+			cache = Boolean.parseBoolean(p.getProperty("UseCache"));
 			
 			boolean b[] = {warnExec, warnShader};
 			loadWarns(b);
 
+			if(sliderVal == 0) labelSize.setText("64x");
+			if(sliderVal == 1) labelSize.setText("48x");
+			if(sliderVal == 2) labelSize.setText("32x");
+			if(sliderVal == 3) labelSize.setText("16x");
+			
 			if(useSameDir) {
 				radioUseSame.setSelection(true);
 				textModDir.setEnabled(false);
@@ -522,7 +498,11 @@ public class Preferences extends Dialog {
 			if(primaryGame)			radioGame.setSelection(true);
 			else					radioLauncher.setSelection(true);
 
-			if(refreshOnStartup)	buttonRefreshBoot.setSelection(true);
+			if(refreshOnStartup) {
+				buttonRefreshBoot.setSelection(true);
+				buttonCache.setEnabled(false);
+				buttonCache.setSelection(false);
+			}
 			else					buttonRefreshBoot.setSelection(false);
 
 			if(minimize)			buttonMinimize.setSelection(true);
@@ -530,11 +510,89 @@ public class Preferences extends Dialog {
 			
 			if(shader)				buttonApplyShader.setSelection(true);
 			else 					buttonApplyShader.setSelection(false);
+			
+			if(cache) 				buttonCache.setSelection(true);
+			else 					buttonCache.setSelection(false);
 
 			textGameDir.setText(gameDir);
 			textModDir.setText(modDir);
 			slider.setSelection(sliderVal);
 		}
+	}
+	
+	private void acceptPrefs() 
+	{
+		if(MainFrame.getModDirectory() != null) {
+			boolean firstTime = false;
+			if(!new File(prefPath).exists()) firstTime = true;
+			
+			String gameDir = textGameDir.getText();
+			String modDir = textModDir.getText();
+
+			Properties p = new Properties();
+
+			if(buttonRefreshBoot.getSelection()) 
+				p.setProperty("RefreshOnStartup", "true");
+			else p.setProperty("RefreshOnStartup", "false");
+
+			if(buttonCache.getSelection()) 
+				p.setProperty("UseCache", "true");
+			else p.setProperty("UseCache", "false");
+			
+			if(radioUseSame.getSelection()) {
+				p.setProperty("UseSameDir", "true");
+				MainFrame.useSameDir = true;
+			} else {
+				p.setProperty("UseSameDir", "false");
+				MainFrame.useSameDir = false;
+			}
+
+			if(radioGame.getSelection()) {
+				p.setProperty("PrimaryGame", "true");
+				MainFrame.startGame = true;
+			} else {
+				p.setProperty("PrimaryGame", "false");
+				MainFrame.startGame = false;
+			}
+
+			if(buttonMinimize.getSelection())
+				p.setProperty("Minimize", "true");
+			else p.setProperty("Minimize", "false");
+			
+			if(buttonApplyShader.getSelection())
+				p.setProperty("ApplyShaders", "true");
+			else p.setProperty("ApplyShaders", "false");
+
+			p.setProperty("IconSize", ""+slider.getSelection());
+			p.setProperty("ModDir", modDir);
+			p.setProperty("GameDir", gameDir);
+			p.setProperty("WarnExec", ""+warnExec);
+			p.setProperty("WarnShader", ""+warnShader);
+			MainFrame.setModDirectory(modDir);
+			MainFrame.setGameDirectory(gameDir);
+			MainFrame.setWarnExec(warnExec);
+			MainFrame.setWarnShader(warnShader);
+
+			ConfigManager.writeConfig(p, prefPath);
+			//Log.info("Printing settings file to: " + prefPath);
+			
+			if(!new File(portPath).exists()) {
+				Properties p2 = new Properties();
+				p2.setProperty("Port", "9999");
+				ConfigManager.writeConfig(p2, prefPath);
+				Log.info("Writing default port settings.");
+			}
+			
+			shell.close();
+			
+			if(firstTime) {
+				Start.checkConfigFolder(new File(gameDir + File.separator + "config" + File.separator + "modloader.cfg"));
+				MainFrame frame = new MainFrame();
+				frame.open();
+				firstTime = false;
+			}
+		}
+
 	}
 	
 	private static void loadWarns(boolean warning[]) 
