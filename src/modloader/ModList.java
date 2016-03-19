@@ -66,6 +66,12 @@ public class ModList {
 		infoCustomExecName.clear();
 		infoIgnoreShaders.clear();
 		listIcon.clear();
+		
+		MainFrame.getDisplay().syncExec(new Runnable() {
+			public void run() {
+				MainFrame.labelModAmount.setText("0");
+			}
+		});
 	}
 	
 	/**
@@ -74,6 +80,10 @@ public class ModList {
 	 */
 	public List<TableItem> getMods() {
 		return ModList.listDataArr;
+	}
+	
+	public static int getModsFound() {
+		return ModList.modsFoundTotal;
 	}
 
 	public String getModTitle() {
@@ -90,10 +100,6 @@ public class ModList {
 	
 	public String getModDesc() {
 		return ModList.modDesc;
-	}
-	
-	public int getModsFound() {
-		return ModList.modsFoundTotal;
 	}
 	
 	public String getModHasCustomShaders() {
@@ -239,11 +245,10 @@ public class ModList {
 			} catch (Exception e) {
 				modTitle = "Untitled";
 				Log.warn("GameName not found. Mod incomplete?");
-				Log.error(e);
 			}
 			
 			File f = new File(fil.getParent());
-			f = new File(f.getParent() + File.separator + "shaders");
+			f = new File(f.getParent() + File.separator + "core" + File.separator + "shaders");
 			if(f.isDirectory()) modShader = "Yes";
 			
 			if(cfgFound) {
@@ -300,15 +305,14 @@ public class ModList {
 			Log.info("Adding mod to list: " + this.getModTitle());
 			
 		} catch (IOException e) {
-			Log.error("IOException");
-			Log.error(e);
+			new Warning(null);
+			Log.error("IOException", e);
 		} finally {
 			if(inputCFG != null) {
 				try {
 					inputCFG.close();
 				} catch (IOException e) {
-					Log.error("IOException");
-					Log.error(e);
+					Log.error("IOException", e);
 				}
 			}
 		}

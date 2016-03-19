@@ -36,7 +36,7 @@ public class Start {
 				try {
 					PORT = Integer.parseInt(p2.getProperty("Port"));
 				} catch (Exception e) {
-					Log.error(e);
+					Log.error("", e);
 				}
 				Log.info("\tPort = " + PORT);
 			} else {
@@ -83,7 +83,7 @@ public class Start {
 				prefs.open();
 			}
 		} catch (Exception e) {
-			Log.error(e);
+			Log.error("", e);
 		} finally {			
 			Log.printLog();				
 		}
@@ -119,7 +119,7 @@ public class Start {
 				Files.copy(Start.class.getResourceAsStream("/resources/icon_default.png"), Paths.get(rootCfg.getParent() + File.separator + "default.png"), StandardCopyOption.REPLACE_EXISTING);
 				Log.info("\tCopied files from jar to config folder.");						
 			} catch (IOException e) {
-				Log.error(e);
+				Log.error("", e);
 			}
 		}
 	}
@@ -137,7 +137,7 @@ public class Start {
 			System.exit(1);
 		}
 		catch (IOException e) {
-			Log.error(e);
+			Log.error("", e);
 			System.exit(2);
 		}
 	}

@@ -1,5 +1,6 @@
 package modloader;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -41,7 +42,7 @@ public class Refresh {
 	public void refreshList() {
 		if(MainFrame.getModDirectory() != null || !MainFrame.getModDirectory().equals("")) {
 			
-			Properties p = ConfigManager.loadConfig(Preferences.prefPath);
+			Properties p = ConfigManager.loadConfig(CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName());
 			if(Boolean.parseBoolean(p.getProperty("UseSameDir")) == true) 
 				 MainFrame.setModDirectory(p.getProperty("GameDir"));				
 			else MainFrame.setModDirectory(p.getProperty("ModDir"));
@@ -54,28 +55,24 @@ public class Refresh {
 				try {
 					modList.resetList();
 				} catch (Exception e) {
-					Log.error("Failed resetList()");
-					Log.error(e);
+					Log.error("Failed resetList()", e);
 				}
 				try {
 					main.checkMods();
 				} catch (Exception e) {
-					Log.error("Failed checkMods()");
-					Log.error(e);
+					Log.error("Failed checkMods()", e);
 				}
 				try {
 					setupNewList();
 				} catch (Exception e) {
-					Log.error("Failed setupNewList()");
-					Log.error(e);
+					Log.error("Failed setupNewList()", e);
 				}
 				ModCache.cacheChanged = true;
 			} catch (Exception e) {
-				Log.error("Failed to refresh list.");
-				Log.error(e);
+				Log.error("Failed to refresh list.", e);
 			}
 		} else {
-			Log.error("ModDir is empty!");
+			Log.warn("ModDir is empty!");
 		}
 		MainFrame.abortRefresh = false;
 	}

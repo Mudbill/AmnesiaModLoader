@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.MessageBox;
 
 public class Shaders {
 	
-	public static boolean installed = false, backupExists = false;
+	public static boolean installed, backupExists = false;
 	private static File rootShaderDir, rootBackupDir, modDir, modShaderDir;
 	public static int cancelOperation = 1;
 	
@@ -24,10 +24,9 @@ public class Shaders {
 		modDir = new File(modDir.getParent());
 		modDir = new File(modDir.getParent());
 		
-		modShaderDir = new File(modDir + File.separator + "shaders");
-		
-		rootShaderDir = new File(MainFrame.getGameDirectory() + File.separator + "shaders");
-		rootBackupDir = new File(MainFrame.getGameDirectory() + File.separator + "shaders_backup");
+		modShaderDir = new File(modDir + File.separator + "core" + File.separator + "shaders");
+		rootShaderDir = new File(MainFrame.getGameDirectory() + File.separator + "core" + File.separator + "shaders");
+		rootBackupDir = new File(MainFrame.getGameDirectory() + File.separator + "core" + File.separator + "shaders_backup");
 	}
 	
 	public static boolean checkShaders()
@@ -35,6 +34,7 @@ public class Shaders {
 		backupExists = false;
 		
 		if(!installed) {
+			
 			//Checking if original folder exists.
 			if(rootBackupDir.isDirectory()) {
 				backupExists = true;
@@ -88,8 +88,7 @@ public class Shaders {
 					Files.copy(Paths.get(shaderFiles[i].getPath()), Paths.get(rootBackupDir.getPath() + File.separator + shaderFiles[i].getName()), StandardCopyOption.REPLACE_EXISTING);
 				}
 			} catch (IOException e) {
-				Log.error("Failed to back up shaders.");
-				Log.error(e);
+				Log.error("Failed to back up shaders.", e);
 				return false;
 			}
 		}
@@ -127,7 +126,7 @@ public class Shaders {
 						StandardCopyOption.REPLACE_EXISTING
 				);
 			} catch (IOException e) {
-				Log.error(e);
+				Log.error("IOException", e);
 			}
 			if(file.isDirectory()) {
 				Log.info(Log.tab() + file.getName() + " is a directory. Delving deeper to copy the contents.");
@@ -137,7 +136,7 @@ public class Shaders {
 				return;
 			}
 		}
-		rootShaderDir = new File(MainFrame.getGameDirectory() + File.separator + "shaders");
+		rootShaderDir = new File(MainFrame.getGameDirectory() + File.separator + "core" + File.separator + "shaders");
 	}
 	
 	private static void deleteShaders()
@@ -158,26 +157,17 @@ public class Shaders {
 						Paths.get(file.getAbsolutePath())
 				);
 			} catch (Exception e) {
-				Log.error(e);
+				Log.error("Exception", e);
 			}
 		}
-		rootShaderDir = new File(MainFrame.getGameDirectory() + File.separator + "shaders");
+		rootShaderDir = new File(MainFrame.getGameDirectory() + File.separator + "core" + File.separator + "shaders");
 	}
 	
 	public static boolean uninstallShaders()
 	{
 		if(rootShaderDir.exists()) {
 			deleteShaders();
-//			
-//			File[] shaderFilesRoot = rootShaderDir.listFiles();
-//			for(int i = 0; i < shaderFilesRoot.length; i++) {
-//				try {
-//					Files.delete(Paths.get(rootShaderDir.getPath() + File.separator + shaderFilesRoot[i].getName()));
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//					return false;
-//				}
-//			}
+
 			Log.info("Cleaning root shaders folder.");
 
 			File[] shaderFilesBackup = rootBackupDir.listFiles();

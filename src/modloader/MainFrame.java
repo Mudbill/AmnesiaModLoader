@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.ProgressBar;
 public class MainFrame {
 	
 	private final static String appName = "Amnesia Modloader";
-	private final static String appVersion = "1.5.0";
+	private final static String appVersion = "1.5.1";
 	private final static String cfgName = "main_init.cfg";
 	
 	private static String modDirectory = "";
@@ -73,13 +73,12 @@ public class MainFrame {
 								fd_progressBar;
 	private Menu menuList;
 	public static ProgressBar progressBar, progressBarInf;
-	private static int progressMax;
 	
 	public static int getIconSize() {
 		int i = 48;
 		
 		try {
-			Properties p = ConfigManager.loadConfig(Preferences.prefPath);
+			Properties p = ConfigManager.loadConfig(CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName());
 
 			int i2 = Integer.parseInt(p.getProperty("IconSize"));
 
@@ -101,7 +100,8 @@ public class MainFrame {
 			}
 			}
 		} catch (Exception e) {
-			Log.error("Could not get and scale image.");
+			new Warning();
+			Log.error("Could not get and scale image.", e);
 		}
 		return i;
 	}
@@ -198,7 +198,7 @@ public class MainFrame {
 	 * Searches specified directories and sub-directories for a file named "main_init.cfg"
 	 */
 	public void checkMods()
-	{			
+	{
 		try {
 			new FindFile(display, progressBar, new File(modDirectory), cfgName).start();
 
@@ -206,12 +206,10 @@ public class MainFrame {
 			if(modDirectory != null) {
 				progressBarInf.setVisible(false);
 				progressBar.setVisible(true);
-				progressMax = new File(modDirectory).listFiles().length;
-				progressBar.setMaximum(progressMax);
-				Log.info("Mods found: " + modList.getModsFound());
+				Log.info("Mods found: " + ModList.getModsFound());
 			}
 		} catch (Exception e) {
-			Log.error("Failed checking for mods.");			
+			Log.error("Failed checking for mods.", e);			
 		}
 	}
 	
@@ -247,13 +245,7 @@ public class MainFrame {
 					CurrentOS.setCustomExecName(exec);
 				}
 			} catch (Exception e) {
-				Log.error("Failed displaying mod info.");
-				
-//				MessageBox m = new MessageBox(shell, SWT.SHEET | SWT.ICON_ERROR);
-//				m.setMessage("An unexpected error occurred while displaying mod info. It probably tried displaying info that doesn't exist because it failed searching for mods. This could be an issue on my part.\nI'm sorry D:");
-//				m.setText("Error");
-//				m.open();		
-//				Log.error(e);
+				Log.error("Failed displaying mod info.", e);
 			}
 			labelTitle.setText(title);
 			labelAuthor.setText(author);
@@ -327,7 +319,7 @@ public class MainFrame {
 		Common.center(shell);
 		
 		try {
-			Properties p = ConfigManager.loadConfig(Preferences.prefPath);
+			Properties p = ConfigManager.loadConfig(CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName());
 				
 			gameDirectory = p.getProperty("GameDir");
 			refreshBoot = Boolean.parseBoolean(p.getProperty("RefreshOnStartup"));
@@ -335,8 +327,8 @@ public class MainFrame {
 			startGame = Boolean.parseBoolean(p.getProperty("PrimaryGame"));
 			setWarnExec(Boolean.parseBoolean(p.getProperty("WarnExec")));
 			setWarnShader(Boolean.parseBoolean(p.getProperty("WarnShader")));
-		} catch (Exception e1) {
-			Log.error("Error loading config: " + Preferences.prefPath);
+		} catch (Exception e) {
+			Log.error("Error loading config: " + CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName(), e);
 		}
 		
 		buttonRefresh = new Button(shell, SWT.NONE);
@@ -372,12 +364,17 @@ public class MainFrame {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				try {
-					Log.info("Opening mods folder at: " + getModDirectory());
-					Desktop.getDesktop().open(new File(getModDirectory()));
+					if(!getModDirectory().equals("")) {
+						Log.info("Opening mods folder at: " + getModDirectory());
+						Desktop.getDesktop().open(new File(getModDirectory()));						
+					} else {
+						Log.warn("ModDir is empty.");
+						new Warning("Mod directory is empty.");						
+					}
 				} catch (IllegalArgumentException e) {
-					Log.error("Could not open folder destination.");
+					Log.error("Could not open folder destination.", e);
 				} catch (IOException e) {
-					Log.error(e);
+					Log.error("", e);
 				}
 			}
 		});
@@ -672,7 +669,7 @@ public class MainFrame {
 			Log.info("Launching mod: " + filePath);
 			boolean ignore = false;
 			
-			Properties p = ConfigManager.loadConfig(Preferences.prefPath);
+			Properties p = ConfigManager.loadConfig(CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName());
 
 			//Shaders
 			try {
@@ -697,7 +694,7 @@ public class MainFrame {
 					}
 				}
 			} catch (Exception e1) {
-				Log.error(e1);
+				Log.error("", e1);
 			}
 			
 			//Runs the game depending on OS
@@ -718,7 +715,7 @@ public class MainFrame {
 				
 				Log.info("Running command: " + gameDirectory + File.separator + exec + " " + filePath);
 			} catch (IOException e) {
-				Log.error("Could not find Amnesia.exe in directory: " + gameDirectory);
+				Log.error("Could not find Amnesia.exe in directory: " + gameDirectory, e);
 				MessageBox m = new MessageBox(shell, SWT.SHEET | SWT.OK | SWT.ICON_ERROR);
 				m.setMessage(exec + " was not found in the specified directory:\n\n" + gameDirectory + "\n\nDouble check the preferences to make sure you input the correct destination.");
 				m.setText("Could not start");
@@ -726,13 +723,13 @@ public class MainFrame {
 			}
 			
 		} catch (ArrayIndexOutOfBoundsException e) {
-			Log.error("No selected index!");
+			Log.warn("No selected index!");
 			MessageBox m = new MessageBox(shell, SWT.SHEET | SWT.OK | SWT.ICON_ERROR);
 			m.setMessage("No mod selected to launch.");
 			m.setText("Could not start");
 			m.open();
 		} catch (NullPointerException e) {
-			Log.error(e);
+			Log.error("", e);
 		}
 	}
 }

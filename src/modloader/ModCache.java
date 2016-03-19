@@ -20,7 +20,7 @@ public class ModCache {
 	
 	public boolean checkCache() {
 		File dir = new File(cacheDir);
-		if(dir.list().length > 0) return true;
+		if(dir.exists() && dir.list().length > 0) return true;
 		else return false;
 	}
 	
@@ -86,35 +86,37 @@ public class ModCache {
 		
 		File[] cacheFiles = new File(cacheDir).listFiles();
 		
-		for(int index = 0; index < cacheFiles.length; index++) {
-			Log.info("Adding cached index " + index + " to list.");
-			
-			Properties p = ConfigManager.loadConfig(cacheDir + File.separator + "cache_index_"+index+".cache");
-			
-			String title = p.getProperty("Title"); 
-			String author = p.getProperty("Author");
-			String icon = p.getProperty("Icon");
-			String desc = p.getProperty("Desc");
-			String compatMin = p.getProperty("CompatMin");
-			String shaders = p.getProperty("Shaders");
-			String shadersIgnore = p.getProperty("ShadersIgnore");
-			String exec = p.getProperty("Exec");
-			String launch = p.getProperty("Launch");
-			
-			List<String> loadCache = new ArrayList<String>();
-			loadCache.add(title);
-			loadCache.add(author);
-			loadCache.add(icon);
-			loadCache.add(desc);
-			loadCache.add(compatMin);
-			loadCache.add(shaders);
-			loadCache.add(shadersIgnore);
-			loadCache.add(exec);
-			loadCache.add(launch);
-			
-			setupCache(loadCache);
+		if(cacheFiles != null) {
+			for(int index = 0; index < cacheFiles.length; index++) {
+				Log.info("Adding cached index " + index + " to list.");
+				
+				Properties p = ConfigManager.loadConfig(cacheDir + File.separator + "cache_index_"+index+".cache");
+				
+				String title = p.getProperty("Title"); 
+				String author = p.getProperty("Author");
+				String icon = p.getProperty("Icon");
+				String desc = p.getProperty("Desc");
+				String compatMin = p.getProperty("CompatMin");
+				String shaders = p.getProperty("Shaders");
+				String shadersIgnore = p.getProperty("ShadersIgnore");
+				String exec = p.getProperty("Exec");
+				String launch = p.getProperty("Launch");
+				
+				List<String> loadCache = new ArrayList<String>();
+				loadCache.add(title);
+				loadCache.add(author);
+				loadCache.add(icon);
+				loadCache.add(desc);
+				loadCache.add(compatMin);
+				loadCache.add(shaders);
+				loadCache.add(shadersIgnore);
+				loadCache.add(exec);
+				loadCache.add(launch);
+				
+				setupCache(loadCache);
+			}
+			MainFrame.labelModAmount.setText(""+cacheFiles.length);			
 		}
-		MainFrame.labelModAmount.setText(""+cacheFiles.length);
 	}
 	
 	private void setupCache(List<String> col) {
@@ -151,8 +153,7 @@ public class ModCache {
 			}
 			
 		} catch(Exception e) {				
-			Log.error("\tFailed adding icon: " + icon);
-			Log.error(e);
+			Log.error("\tFailed adding icon: " + icon, e);
 			modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrame.class, ModList.defIcon), MainFrame.getIconSize()));
 		}
 				

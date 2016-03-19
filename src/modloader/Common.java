@@ -47,8 +47,7 @@ public class Common {
 			try {
 		        desktop.browse(url.toURI());
 		    } catch (Exception e) {
-		    	Log.error("Could not open website!");
-		        Log.error(e);
+		    	Log.error("Could not open website!", e);
 		    }
 		}
 	}
@@ -93,7 +92,7 @@ public class Common {
 				public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
 					if(MainFrame.abortRefresh) return null;
 					if (exc != null)
-						Log.error("Had trouble traversing: " + dir + " (" + exc + ")");
+						Log.warn("Had trouble traversing: " + dir + " (" + exc + ")");
 					return FileVisitResult.CONTINUE;
 				}
 			});

@@ -29,14 +29,14 @@ public class ConfigManager {
 			Log.warn("Could not find config file: " + filePath);
 			return null;
 		} catch (IOException e) {
-			Log.error("Could not read config file: " + filePath);
+			Log.error("Could not read config file: " + filePath, e);
 			return null;
 		} finally {
 			if (inputStream != null) {
 				try {
 					inputStream.close();
 				} catch (IOException e) {
-					Log.error("Could not close config file: " + filePath);
+					Log.error("Could not close config file: " + filePath, e);
 					return null;
 				}
 			}
@@ -54,8 +54,7 @@ public class ConfigManager {
 			Log.info("Writing config to: " + filePath);
 			properties.store(new FileOutputStream(filePath), null);
 		} catch (IOException e) {
-			Log.error("Could not write config file: " + filePath);
-			Log.error(e);
+			Log.error("Could not write config file: " + filePath, e);
 		}
 	}
 	
@@ -71,7 +70,7 @@ public class ConfigManager {
 			b = new BufferedWriter(new FileWriter(logPath));
 			b.write(s);
 		} catch (IOException e) {
-			Log.error(e);
+			Log.error("", e);
 		} finally {
 			try {
 				b.close();

@@ -28,21 +28,20 @@ public class Log {
 		return TAB;
 	}
 	
-	public static void error(String msg)
+	public static void error(String msg, Exception e)
 	{
+		new Warning();
+		
 		String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 		String s = "("+timeStamp+")\t" + ERROR + msg;
 		log.append(s + System.lineSeparator());
 		System.err.println(s);
-	}
-	
-	public static void error(Exception e)
-	{
+		
 		StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
-		String s = sw.toString();
-		log.append(s + System.lineSeparator());
-		System.err.println(s);
+		String s2 = sw.toString();
+		log.append(s2 + System.lineSeparator());
+		System.err.println(s2);
 	}
 	
 	public static void warn(String msg)

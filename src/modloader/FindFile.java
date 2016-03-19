@@ -6,7 +6,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ProgressBar;
 
 public class FindFile extends Thread 
@@ -39,7 +41,12 @@ public class FindFile extends Thread
 				if (progressBar.isDisposed()) return;
 				progressBar.setVisible(false);
 				progressBar.setSelection(progressBar.getMaximum());
-				MainFrame.displayModInfo();
+				if(ModList.getModsFound() == 0) {
+					MessageBox m = new MessageBox(MainFrame.getShell(), SWT.ICON_WARNING);
+					m.setText("No mods found");
+					m.setMessage("No mods were found in the specified directory. Double check the preferences, and make sure you have mods installed.");
+					m.open();
+				}
 			}
 		});
 	}
@@ -56,12 +63,12 @@ public class FindFile extends Thread
 		
         try (DirectoryStream<Path> list = Files.newDirectoryStream(file.toPath())) {
 			if (!firstLoop) {
-				int i = Common.getFileAmount(file.toPath());
+				//int i = Common.getFileAmount(file.toPath());
 				display.asyncExec(new Runnable() {
 					public void run() {
 						if (progressBar.isDisposed()) return;
-						progressBar.setMaximum(i);
-						Log.info("Files to scan = " + i);
+						progressBar.setMaximum(10000);
+						//Log.info("Files to scan = " + i);
 					}
 				});
 				firstLoop = true;
@@ -84,7 +91,7 @@ public class FindFile extends Thread
         		}
         	}
         } catch (IOException e) {
-        	Log.error(e);
+        	Log.error("", e);
         }
     }
 }

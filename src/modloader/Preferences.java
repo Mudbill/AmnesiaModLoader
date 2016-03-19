@@ -28,8 +28,8 @@ import org.eclipse.swt.custom.ScrolledComposite;
 
 public class Preferences extends Dialog {
 
-	public static String prefPath = CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName();
-	public static String portPath = CurrentOS.getSaveDir() + File.separator + CurrentOS.getPortConfigName();
+	private static String prefPath = CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName();
+	private static String portPath = CurrentOS.getSaveDir() + File.separator + CurrentOS.getPortConfigName();
 	private static boolean warnExec = true;
 	private static boolean warnShader = true;
 	
@@ -130,7 +130,7 @@ public class Preferences extends Dialog {
 				try {
 					Common.openWebpage(new URL(urlWeb));
 				} catch (MalformedURLException e) {
-					Log.error(e);
+					Log.error("MalformedURLException", e);
 				}
 			}
 		});
@@ -146,7 +146,7 @@ public class Preferences extends Dialog {
 				try {
 					Common.openWebpage(new URL(urlForum));
 				} catch (MalformedURLException e) {
-					Log.error(e);
+					Log.error("MalformedURLException", e);
 				}
 			}
 		});
@@ -162,7 +162,7 @@ public class Preferences extends Dialog {
 				try {
 					Common.openWebpage(new URL(urlTwitter));
 				} catch (MalformedURLException e) {
-					Log.error(e);
+					Log.error("MalformedURLException", e);
 				}
 			}
 		});
@@ -178,7 +178,7 @@ public class Preferences extends Dialog {
 				try {
 					Common.openWebpage(new URL(urlYoutube));
 				} catch (MalformedURLException e) {
-					Log.error(e);
+					Log.error("MalformedURLException", e);
 				}
 			}
 		});
