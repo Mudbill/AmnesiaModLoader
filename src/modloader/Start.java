@@ -66,7 +66,7 @@ public class Start {
 					Log.info("\tModDir = " + modDir);
 				}
 				File rootCfg = new File(p.getProperty("GameDir") + File.separator + "config" + File.separator + "modloader.cfg");
-				checkConfigFolder(rootCfg);
+				checkConfigFolder(rootCfg, Boolean.parseBoolean(p.getProperty("WarnConfig")));
 				
 				MainFrame frame = new MainFrame();
 				MainFrame.setModDirectory(modDir);
@@ -89,7 +89,7 @@ public class Start {
 		}
 	}
 	
-	public static void checkConfigFolder(File rootCfg) {
+	public static void checkConfigFolder(File rootCfg, boolean warn) {
 		MessageBox m = new MessageBox(new Shell(), SWT.SHEET | SWT.ICON_INFORMATION | SWT.YES | SWT.NO);
 
 		if (rootCfg.exists() && rootCfg != null) {
@@ -113,14 +113,15 @@ public class Start {
 			m.setMessage("Your specified game directory is lacking an important file for the Modloader to work. Shall I copy it there now? If not, the Modloader may not work properly.");
 		}
 
-		if(m.open() == SWT.YES) {
-			try {
-				Files.copy(Start.class.getResourceAsStream("/resources/modloader.cfg"), Paths.get(rootCfg.getPath()), StandardCopyOption.REPLACE_EXISTING);
-				Files.copy(Start.class.getResourceAsStream("/resources/icon_default.png"), Paths.get(rootCfg.getParent() + File.separator + "default.png"), StandardCopyOption.REPLACE_EXISTING);
-				Log.info("\tCopied files from jar to config folder.");						
-			} catch (IOException e) {
-				Log.error("", e);
-			}
+		
+		if(warn) if(m.open() != SWT.YES) return;
+		
+		try {
+			Files.copy(Start.class.getResourceAsStream("/resources/modloader.cfg"), Paths.get(rootCfg.getPath()), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(Start.class.getResourceAsStream("/resources/icon_default.png"), Paths.get(rootCfg.getParent() + File.separator + "default.png"), StandardCopyOption.REPLACE_EXISTING);
+			Log.info("\tCopied files from jar to config folder.");						
+		} catch (IOException e) {
+			Log.error("", e);
 		}
 	}
 

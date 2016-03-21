@@ -1,12 +1,10 @@
-AmnesiaModLoader
+Amnesia Modloader v1.6.0
 
 ================
 
 Modloader Java application for Amnesia - The Dark Descent.
 
-This is the entire Eclipse project. You can import it by placing it in your Eclipse workspace and creating a "new" project by the name of AmnesiaModLoader.
-Otherwise you can use File > Import.
+This is the entire Eclipse project. Import it using File > Import in Eclipse. Start.java will boot the program.
+Information about this application can be found here: https://www.frictionalgames.com/forum/thread-25806.html
 
-Developed throughout July 2014 by a Java noob. Enjoy!
-
-Updated to 1.3 during February 2015 and published. 
+Feel free to contact me with questions.

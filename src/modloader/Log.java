@@ -30,7 +30,7 @@ public class Log {
 	
 	public static void error(String msg, Exception e)
 	{
-		new Warning();
+		new Error();
 		
 		String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 		String s = "("+timeStamp+")\t" + ERROR + msg;

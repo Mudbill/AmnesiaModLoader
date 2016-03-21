@@ -6,11 +6,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-public class Warning {
+public class Error {
 	
 	private String boxText;
 	
-	public Warning() {
+	public Error() {
 		
 		boxText = "An error occurred. Check the log for details:\n\n" + CurrentOS.getSaveDir() + File.separator + CurrentOS.getLogName();
 		
@@ -20,7 +20,7 @@ public class Warning {
 		m.open();
 	}
 	
-	public Warning(String warningMessage) {
+	public Error(String warningMessage) {
 		this.boxText = warningMessage;
 		
 		if(boxText == null) boxText = "An error occurred. Check the log for details:\n\n" + CurrentOS.getSaveDir() + File.separator + CurrentOS.getLogName();

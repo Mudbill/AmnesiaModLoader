@@ -305,7 +305,7 @@ public class ModList {
 			Log.info("Adding mod to list: " + this.getModTitle());
 			
 		} catch (IOException e) {
-			new Warning(null);
+			new Error(null);
 			Log.error("IOException", e);
 		} finally {
 			if(inputCFG != null) {

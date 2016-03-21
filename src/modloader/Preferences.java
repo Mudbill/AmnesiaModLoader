@@ -30,8 +30,7 @@ public class Preferences extends Dialog {
 
 	private static String prefPath = CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName();
 	private static String portPath = CurrentOS.getSaveDir() + File.separator + CurrentOS.getPortConfigName();
-	private static boolean warnExec = true;
-	private static boolean warnShader = true;
+	private static boolean warnExec = true, warnShader = true, warnConfig = true;
 	
 	private static final String urlWeb = "https://www.buttology.net/downloads/amnesia-modloader";
 	private static final String urlForum = "https://www.frictionalgames.com/forum/thread-25806.html";
@@ -255,7 +254,7 @@ public class Preferences extends Dialog {
 				DirectoryDialog dd= new DirectoryDialog(shell, SWT.SHEET);
 				dd.setMessage("Select the directory to search for mods in.");
 				dd.setText("Open Mod Directory");
-				dd.setFilterPath(CurrentOS.getDefDir());
+				
 				String s = dd.open();
 				
 				if(s != null) {
@@ -283,7 +282,6 @@ public class Preferences extends Dialog {
 				DirectoryDialog dd= new DirectoryDialog(shell, SWT.SHEET);
 				dd.setMessage("Select your game installation directory.");
 				dd.setText("Open Game Directory");
-				dd.setFilterPath(CurrentOS.getDefDir());
 				String s = dd.open();
 				
 				if(s != null) {
@@ -475,9 +473,10 @@ public class Preferences extends Dialog {
 			sliderVal = Integer.parseInt(p.getProperty("IconSize"));
 			warnExec = Boolean.parseBoolean(p.getProperty("WarnExec"));
 			warnShader = Boolean.parseBoolean(p.getProperty("WarnShader"));
+			warnConfig = Boolean.parseBoolean(p.getProperty("WarnConfig"));
 			cache = Boolean.parseBoolean(p.getProperty("UseCache"));
 			
-			boolean b[] = {warnExec, warnShader};
+			boolean b[] = {warnExec, warnShader, warnConfig};
 			loadWarns(b);
 
 			if(sliderVal == 0) labelSize.setText("64x");
@@ -568,6 +567,7 @@ public class Preferences extends Dialog {
 			p.setProperty("GameDir", gameDir);
 			p.setProperty("WarnExec", ""+warnExec);
 			p.setProperty("WarnShader", ""+warnShader);
+			p.setProperty("WarnConfig", ""+warnConfig);
 			MainFrame.setModDirectory(modDir);
 			MainFrame.setGameDirectory(gameDir);
 			MainFrame.setWarnExec(warnExec);
@@ -586,7 +586,7 @@ public class Preferences extends Dialog {
 			shell.close();
 			
 			if(firstTime) {
-				Start.checkConfigFolder(new File(gameDir + File.separator + "config" + File.separator + "modloader.cfg"));
+				Start.checkConfigFolder(new File(gameDir + File.separator + "config" + File.separator + "modloader.cfg"), Boolean.parseBoolean(p.getProperty("WarnConfig")));
 				MainFrame frame = new MainFrame();
 				frame.open();
 				firstTime = false;
@@ -599,6 +599,7 @@ public class Preferences extends Dialog {
 	{
 		WarningDialog.warnExec = warning[0];
 		WarningDialog.warnShader = warning[1];
+		WarningDialog.warnConfig = warning[2];
 	}
 	
 	/**
@@ -608,5 +609,6 @@ public class Preferences extends Dialog {
 	{
 		warnExec = warning[0];
 		warnShader = warning[1];
+		warnConfig = warning[2];
 	}
 }

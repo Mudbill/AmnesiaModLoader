@@ -8,6 +8,8 @@ import java.util.Properties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.wb.swt.SWTResourceManager;
 
@@ -55,15 +57,15 @@ public class ModCache {
 			ModList modList = new ModList();
 			Properties p = new Properties();
 			
-			title = modList.getModTitle(index); Log.info("\tCache title: " + title);
-			author = modList.getModAuthor(index); Log.info("\tCache author: " + author);
-			desc = modList.getModDesc(index); Log.info("\tCache desc: " + desc);
-			icon = ModList.listIcon.get(index).getAbsolutePath(); Log.info("\tCache icon: " + icon);
-			compatMin = modList.getModMinCompatibility(index); Log.info("\tCache compatMin: " + compatMin);
-			shaders = modList.getModHasCustomShaders(index); Log.info("\tCache shaders: " + shaders);
-			shadersIgnore = modList.getModIgnoreShaders(index); Log.info("\tCache shadersIgnore: " + shadersIgnore);
-			exec = modList.getModExecName(index); Log.info("\tCache exec: " + exec);
-			launch = modList.getLaunchIndex(index); Log.info("\tCache launch: " + launch);
+			title = modList.getModTitle(index); Log.info("\tWrite cache title: " + title);
+			author = modList.getModAuthor(index); Log.info("\tWrite cache author: " + author);
+			desc = modList.getModDesc(index); Log.info("\tWrite cache desc: " + desc);
+			icon = ModList.listIcon.get(index).getAbsolutePath(); Log.info("\tWrite cache icon: " + icon);
+			compatMin = modList.getModMinCompatibility(index); Log.info("\tWrite cache compatMin: " + compatMin);
+			shaders = modList.getModHasCustomShaders(index); Log.info("\tWrite cache shaders: " + shaders);
+			shadersIgnore = modList.getModIgnoreShaders(index); Log.info("\tWrite cache shadersIgnore: " + shadersIgnore);
+			exec = modList.getModExecName(index); Log.info("\tWrite cache exec: " + exec);
+			launch = modList.getLaunchIndex(index); Log.info("\tWrite cache launch: " + launch);
 			
 			if(exec == null) exec = "";
 			
@@ -102,18 +104,27 @@ public class ModCache {
 				String exec = p.getProperty("Exec");
 				String launch = p.getProperty("Launch");
 				
-				List<String> loadCache = new ArrayList<String>();
-				loadCache.add(title);
-				loadCache.add(author);
-				loadCache.add(icon);
-				loadCache.add(desc);
-				loadCache.add(compatMin);
-				loadCache.add(shaders);
-				loadCache.add(shadersIgnore);
-				loadCache.add(exec);
-				loadCache.add(launch);
-				
-				setupCache(loadCache);
+				File f = new File(launch);
+				if(!f.exists() || !f.isFile()) {
+					Log.warn("Cache entry doesn't exist: " + launch);
+					MessageBox m = new MessageBox(new Shell(), SWT.ICON_WARNING | SWT.YES);
+					m.setMessage("The cache attempted to load a file which appears to be missing:\n\n" + launch + "\n\nThe entry has not been added. Please refresh the mod list to update the cache.");
+					m.setText("Cache warning");
+					m.open();
+				} else {
+					List<String> loadCache = new ArrayList<String>();
+					loadCache.add(title);
+					loadCache.add(author);
+					loadCache.add(icon);
+					loadCache.add(desc);
+					loadCache.add(compatMin);
+					loadCache.add(shaders);
+					loadCache.add(shadersIgnore);
+					loadCache.add(exec);
+					loadCache.add(launch);
+					
+					setupCache(loadCache);
+				}	
 			}
 			MainFrame.labelModAmount.setText(""+cacheFiles.length);			
 		}
@@ -166,15 +177,15 @@ public class ModCache {
 		ModList.infoIgnoreShaders.add(shadersIgnore); 
 		ModList.index.add(launch);
 		
-		Log.info("\tCache title: " + title);
-		Log.info("\tCache author: " + author);
-		Log.info("\tCache desc: " + desc);
-		Log.info("\tCache icon: " + icon);
-		Log.info("\tCache compatMin: " + compatMin);
-		Log.info("\tCache shaders: " + shaders);
-		Log.info("\tCache shadersIgnore: " + shadersIgnore);
-		Log.info("\tCache exec: " + exec);
-		Log.info("\tCache launch: " + launch);
+		Log.info("\tLoad cache title: " + title);
+		Log.info("\tLoad cache author: " + author);
+		Log.info("\tLoad cache desc: " + desc);
+		Log.info("\tLoad cache icon: " + icon);
+		Log.info("\tLoad cache compatMin: " + compatMin);
+		Log.info("\tLoad cache shaders: " + shaders);
+		Log.info("\tLoad cache shadersIgnore: " + shadersIgnore);
+		Log.info("\tLoad cache exec: " + exec);
+		Log.info("\tLoad cache launch: " + launch);
 		
 		modItem.setText(title);
 		ModList.modsFoundTotal += 1;

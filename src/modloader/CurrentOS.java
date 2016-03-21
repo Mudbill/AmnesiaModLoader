@@ -1,7 +1,6 @@
 package modloader;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Locale;
@@ -11,7 +10,7 @@ import org.eclipse.swt.widgets.MessageBox;
 
 public class CurrentOS {
 	
-	private static String system, gameExe, launcherExe, saveDir, defDir, config, portConfig, log, execExt;
+	private static String system, gameExe, launcherExe, saveDir, config, portConfig, log, execExt;
 		
 	/**
 	 * Constructor that determines the system that this application is being ran from.
@@ -41,20 +40,20 @@ public class CurrentOS {
 		
 		if(system == "Windows") {
 			execExt = ".exe";
-			saveDir = System.getProperty("user.home") + File.separator + "AppData\\Roaming\\Amnesia ModLoader";
+			saveDir = System.getProperty("user.dir");
+			//saveDir = System.getProperty("user.home") + File.separator + "AppData\\Roaming\\Amnesia Modloader";
 		}
 //		else if(system == "MacOS") {
 //			execExt = ".app";
-//			saveDir = System.getProperty("user.home") + File.separator + "Library/Application Support/Frictional Games/Amnesia/ModLoader";
+//			saveDir = System.getProperty("user.home") + File.separator + "Library/Application Support/Frictional Games/Amnesia/Modloader";
 //		}
 //		else if(system == "Linux") {
 //			execExt = ".bin";
-//			saveDir = System.getProperty("user.home") + File.separator + "Amnesia/ModLoader";
+//			saveDir = System.getProperty("user.home") + File.separator + "Amnesia/Modloader";
 //		}
 
 		gameExe = "Amnesia";
 		launcherExe = "Launcher";
-		defDir = System.getProperty("user.dir");
 		config = "preferences.cfg";
 		portConfig = "port.cfg";
 		log = "log.log";
@@ -74,11 +73,6 @@ public class CurrentOS {
 	public static String getSaveDir()
 	{
 		return saveDir;
-	}
-	
-	public static String getDefDir()
-	{
-		return defDir;
 	}
 	
 	public static String getConfigName()
@@ -103,7 +97,7 @@ public class CurrentOS {
 		if(gameRunning()) {
 			MessageBox m = new MessageBox(MainFrame.getShell(), SWT.SHEET | SWT.ICON_WARNING | SWT.YES | SWT.NO);
 			m.setText("Shutdown?");
-			m.setMessage("It looks like Amnesia might be running. If you shut down the Modloader now, it will not be able to install/uninstall any custom shaders that might be required by the mod. I recommend you shut down Amnesia first.\n\nDo you really want to exit now?");
+			m.setMessage("It looks like Amnesia might be running. If you shut down the Modloader now, it may not be able to install/uninstall any custom shaders that might be required by the mod. I recommend you shut down Amnesia first.\n\nDo you really want to exit now?");
 			if(m.open() != SWT.YES) {
 				return false;
 			}

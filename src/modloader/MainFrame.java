@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.ProgressBar;
 public class MainFrame {
 	
 	private final static String appName = "Amnesia Modloader";
-	private final static String appVersion = "1.5.1";
+	private final static String appVersion = "1.6.0";
 	private final static String cfgName = "main_init.cfg";
 	
 	private static String modDirectory = "";
@@ -100,7 +100,7 @@ public class MainFrame {
 			}
 			}
 		} catch (Exception e) {
-			new Warning();
+			new Error();
 			Log.error("Could not get and scale image.", e);
 		}
 		return i;
@@ -369,7 +369,7 @@ public class MainFrame {
 						Desktop.getDesktop().open(new File(getModDirectory()));						
 					} else {
 						Log.warn("ModDir is empty.");
-						new Warning("Mod directory is empty.");						
+						new Error("Mod directory is empty.");						
 					}
 				} catch (IllegalArgumentException e) {
 					Log.error("Could not open folder destination.", e);
