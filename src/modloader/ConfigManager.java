@@ -22,7 +22,7 @@ public class ConfigManager {
 	 */
 	public static Properties loadConfig(String filePath) {
 		try {
-			//Log.info("Loading config: " + filePath);
+			properties = new Properties();
 			inputStream = new FileInputStream(filePath);
 			properties.load(inputStream);
 		} catch (FileNotFoundException e) {

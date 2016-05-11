@@ -50,7 +50,6 @@ public class Refresh {
 			try {
 				MainFrame.buttonRefresh.setVisible(false);
 				MainFrame.buttonRefreshCancel.setVisible(true);
-				MainFrame.progressBarInf.setVisible(true);
 				MainFrame.progressBar.setSelection(0);
 				try {
 					modList.resetList();

@@ -65,6 +65,7 @@ public class Start {
 					Log.info("\tGameDir = " + p.getProperty("GameDir"));
 					Log.info("\tModDir = " + modDir);
 				}
+								
 				File rootCfg = new File(p.getProperty("GameDir") + File.separator + "config" + File.separator + "modloader.cfg");
 				checkConfigFolder(rootCfg, Boolean.parseBoolean(p.getProperty("WarnConfig")));
 				
@@ -74,12 +75,12 @@ public class Start {
 			} else {
 				Log.info("Preferences not found, first startup?");
 
-				MessageBox m = new MessageBox(new Shell(), SWT.SHEET | SWT.ICON_INFORMATION);
-				m.setMessage("Welcome! Please specify some settings before continuing.\nThese can be changed later by selecting the \"Preferences\" button in the main window.");
+				MessageBox m = new MessageBox(new Shell(), SWT.POP_UP | SWT.ICON_INFORMATION);
+				m.setMessage("Welcome! Please specify some settings before continuing.\nThese can be changed later by selecting the \"Options\" button in the main window.");
 				m.setText("First time setup");
 				m.open();
 				
-				Preferences prefs = new Preferences(new Shell(), SWT.SHEET);
+				Preferences prefs = new Preferences(new Shell(), SWT.DIALOG_TRIM);
 				prefs.open();
 			}
 		} catch (Exception e) {
@@ -90,7 +91,7 @@ public class Start {
 	}
 	
 	public static void checkConfigFolder(File rootCfg, boolean warn) {
-		MessageBox m = new MessageBox(new Shell(), SWT.SHEET | SWT.ICON_INFORMATION | SWT.YES | SWT.NO);
+		MessageBox m = new MessageBox(new Shell(), SWT.POP_UP | SWT.ICON_INFORMATION | SWT.YES | SWT.NO);
 
 		if (rootCfg.exists() && rootCfg != null) {
 			Log.info("\tRoot config found: " + rootCfg.getPath());
@@ -131,7 +132,7 @@ public class Start {
 		}
 		catch (BindException e) {
 			Log.warn("Instance already running! Shutting down.");
-			MessageBox m = new MessageBox(new Shell(), SWT.SHEET | SWT.ICON_WARNING);
+			MessageBox m = new MessageBox(new Shell(), SWT.POP_UP | SWT.ICON_WARNING);
 			m.setMessage("Another instance of the application is running. To avoid conflicts, only one can run at a time.\n\nIf you believe this is an error, change the port settings.\nCurrent port: " + PORT);
 			m.setText("Duplicate Instance");
 			m.open();

@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.MessageBox;
 
 public class CurrentOS {
 	
-	private static String system, gameExe, launcherExe, saveDir, config, portConfig, log, execExt;
+	private static String system, gameExe, launcherExe, saveDir, config, portConfig, log, execExt, steamPath;
 		
 	/**
 	 * Constructor that determines the system that this application is being ran from.
@@ -43,10 +43,11 @@ public class CurrentOS {
 			saveDir = System.getProperty("user.dir");
 			//saveDir = System.getProperty("user.home") + File.separator + "AppData\\Roaming\\Amnesia Modloader";
 		}
-//		else if(system == "MacOS") {
-//			execExt = ".app";
-//			saveDir = System.getProperty("user.home") + File.separator + "Library/Application Support/Frictional Games/Amnesia/Modloader";
-//		}
+		else if(system == "MacOS") {
+			execExt = ".app";
+			saveDir = System.getProperty("user.dir");
+			//saveDir = System.getProperty("user.home") + "/Library/Application Support/Amnesia Modloader";
+		}
 //		else if(system == "Linux") {
 //			execExt = ".bin";
 //			saveDir = System.getProperty("user.home") + File.separator + "Amnesia/Modloader";
@@ -58,6 +59,15 @@ public class CurrentOS {
 		portConfig = "port.cfg";
 		log = "log.log";
 		Log.info("\tSystem = " + system + ", preference directory = " + saveDir);
+	}
+	
+	public static String getSystem()
+	{
+		return system;
+	}
+	
+	public static String getSteam() {
+		return steamPath;
 	}
 	
 	public static String getGameExe()
@@ -115,6 +125,12 @@ public class CurrentOS {
 	 * @return
 	 */
 	public static boolean gameRunning() {
+		
+		if(system != "Windows") {
+			Log.info("Not running on Windows, skipping process check.");
+			return false;
+		}
+		
 		String line;
 		String pidInfo = "";
 		

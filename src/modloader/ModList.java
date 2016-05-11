@@ -255,7 +255,7 @@ public class ModList {
 				cfg.load(inputCFG);
 				if(cfg.getProperty("Author") != null) modAuthor = cfg.getProperty("Author"); 
 				if(cfg.getProperty("IconFile") != null) modIcon = cfg.getProperty("IconFile"); 
-				if(cfg.getProperty("Description") != null) modDesc = cfg.getProperty("Description").replace("â", "'"); //Patch odd formatting
+				if(cfg.getProperty("Description") != null) modDesc = cfg.getProperty("Description").replace("ï¿½", "'"); //Patch odd formatting
 				
 				try {
 					if(cfg.getProperty("MinVersion") != null) modMinVer = ""+Float.parseFloat(cfg.getProperty("MinVersion")); 
@@ -279,7 +279,7 @@ public class ModList {
 			
 			addModInfo(null);
 			
-			File iconFile = new File(cfgPath + File.separator + modIcon);
+			final File iconFile = new File(cfgPath + File.separator + modIcon);
 			listIcon.add(iconFile);
 						
 			modsFoundTotal += 1;

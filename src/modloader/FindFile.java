@@ -67,7 +67,7 @@ public class FindFile extends Thread
 				display.asyncExec(new Runnable() {
 					public void run() {
 						if (progressBar.isDisposed()) return;
-						progressBar.setMaximum(10000);
+						progressBar.setMaximum(100);
 						//Log.info("Files to scan = " + i);
 					}
 				});
