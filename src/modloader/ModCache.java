@@ -39,9 +39,9 @@ public class ModCache {
 	public void writeCache() {
 		if(!cacheChanged) return;
 		
-		Log.info("Writing cache for next boot...");
-		
+		Log.info("Clearing out old cache.");
 		clearCache();
+		Log.info("Writing cache for next boot...");
 		
 		for(int index = 0; index < ModList.modsFoundTotal; index++) {
 			String title = "Untitled";
@@ -126,7 +126,8 @@ public class ModCache {
 					setupCache(loadCache);
 				}	
 			}
-			MainFrame.labelModAmount.setText(""+cacheFiles.length);			
+			if(CurrentOS.getSystem() == "MacOS") MainFrameOSX.labelModAmount.setText(""+cacheFiles.length);
+			else if(CurrentOS.getSystem() == "Windows") MainFrameWin32.labelModAmount.setText(""+cacheFiles.length);
 		}
 	}
 	
@@ -141,7 +142,7 @@ public class ModCache {
 		String exec = col.get(7);
 		String launch = col.get(8);
 		
-		TableItem modItem = new TableItem(MainFrame.tableMods, SWT.NONE);
+		TableItem modItem = new TableItem(MainFrameWin32.tableMods, SWT.NONE);
 		modItem.setFont(SWTResourceManager.getFont("System", 11, SWT.NORMAL));
 
 		try {
@@ -156,16 +157,16 @@ public class ModCache {
 			{
 				//scale the image to specified size.
 				Image image = new Image(Display.getDefault(), iconFile.toString());
-				modItem.setImage(Common.scale(image, MainFrame.getIconSize()));
+				modItem.setImage(Common.scale(image, MainFrameOSX.getIconSize()));
 				
 			} else {
 				Log.warn("Icon file not found. Using default.");
-				modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrame.class, ModList.defIcon), MainFrame.getIconSize()));
+				modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrameOSX.class, ModList.defIcon), MainFrameOSX.getIconSize()));
 			}
 			
 		} catch(Exception e) {				
 			Log.error("\tFailed adding icon: " + icon, e);
-			modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrame.class, ModList.defIcon), MainFrame.getIconSize()));
+			modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrameOSX.class, ModList.defIcon), MainFrameOSX.getIconSize()));
 		}
 				
 		ModList.infoTitle.add(title);

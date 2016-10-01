@@ -1,0 +1,10 @@
+#Sat Oct 01 14:32:12 CEST 2016
+Icon=D\:\\SteamLibrary\\steamapps\\common\\Amnesia The Dark Descent\\SecondDimension\\config\\SecondDimensionIcon_aml.png
+CompatMin=1.3
+Launch=D\:\\SteamLibrary\\steamapps\\common\\Amnesia The Dark Descent\\SecondDimension\\config\\main_init.cfg
+Author=Aetheric Games
+Title=Amnesia - The Second Dimension
+Exec=ATSD
+Shaders=No
+ShadersIgnore=false
+Desc=Amnesia\: The Second Dimension is a mod that turns A\:TDD into a puzzle platformer with comedy and horror elements, with 2D action in a 3D environment.\n\nIt is currently only supported on Windows and will not run properly on Mac or Linux.\n\nPlease ensure you are using Modloader version 1.4 or newer, or the mod will not work properly.

@@ -9,7 +9,6 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class Refresh {
 
-	private MainFrame main = new MainFrame();
 	private ModList modList = new ModList();
 	
 	public Refresh() {}
@@ -20,12 +19,16 @@ public class Refresh {
 	public void setupNewList() {
 		List<TableItem> listNewData = new ArrayList<TableItem>();
 		
-		if(MainFrame.getModDirectory() != null || !MainFrame.getModDirectory().isEmpty()) {
+		if(CurrentOS.getSystem() == "MacOS") if(MainFrameOSX.getModDirectory() != null || !MainFrameOSX.getModDirectory().isEmpty()) {
+			listNewData = modList.getMods();	
+			//Log.info("modList.getMods() amount = " + modList.getMods().size());
+		} else if(CurrentOS.getSystem() == "Windows") if(Engine.getModDirectory() != null || !Engine.getModDirectory().isEmpty()) {
 			listNewData = modList.getMods();	
 			//Log.info("modList.getMods() amount = " + modList.getMods().size());
 		}
 		
-		MainFrame.setupModList(listNewData);
+		if(CurrentOS.getSystem() == "MacOS") MainFrameOSX.setupModList(listNewData);
+		else if(CurrentOS.getSystem() == "Windows") MainFrameWin32.setupModList(listNewData);
 	}
 	
 	/**
@@ -33,47 +36,87 @@ public class Refresh {
 	 * @return
 	 */
 	public static int getListIndex() {
-		return MainFrame.tableMods.getSelectionIndex();
+		if(CurrentOS.getSystem() == "MacOS") return MainFrameOSX.tableMods.getSelectionIndex();
+		else if(CurrentOS.getSystem() == "Windows") return MainFrameWin32.tableMods.getSelectionIndex();
+		
+		return 0;
 	}
 	
 	/**
 	 * Refreshes the list
 	 */
 	public void refreshList() {
-		if(MainFrame.getModDirectory() != null || !MainFrame.getModDirectory().equals("")) {
-			
-			Properties p = ConfigManager.loadConfig(CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName());
-			if(Boolean.parseBoolean(p.getProperty("UseSameDir")) == true) 
-				 MainFrame.setModDirectory(p.getProperty("GameDir"));				
-			else MainFrame.setModDirectory(p.getProperty("ModDir"));
-			
-			try {
-				MainFrame.buttonRefresh.setVisible(false);
-				MainFrame.buttonRefreshCancel.setVisible(true);
-				MainFrame.progressBarInf.setVisible(true);
-				MainFrame.progressBar.setSelection(0);
+		if(CurrentOS.getSystem() == "MacOS") {
+			if(MainFrameOSX.getModDirectory() != null || !MainFrameOSX.getModDirectory().equals("")) {
+				
+				Properties p = ConfigManager.loadConfig(CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName());
+				if(Boolean.parseBoolean(p.getProperty("UseSameDir")) == true) 
+					MainFrameOSX.setModDirectory(p.getProperty("GameDir"));				
+				else MainFrameOSX.setModDirectory(p.getProperty("ModDir"));
+				
 				try {
-					modList.resetList();
+					MainFrameOSX.buttonRefresh.setVisible(false);
+					MainFrameOSX.buttonRefreshCancel.setVisible(true);
+					MainFrameOSX.progressBar.setSelection(0);
+					try {
+						modList.resetList();
+					} catch (Exception e) {
+						Log.error("Failed resetList()", e);
+					}
+					try {
+						Engine.checkMods(MainFrameOSX.getDisplay(), MainFrameOSX.progressBar);
+					} catch (Exception e) {
+						Log.error("Failed checkMods()", e);
+					}
+					try {
+						setupNewList();
+					} catch (Exception e) {
+						Log.error("Failed setupNewList()", e);
+					}
+					ModCache.cacheChanged = true;
 				} catch (Exception e) {
-					Log.error("Failed resetList()", e);
+					Log.error("Failed to refresh list.", e);
 				}
-				try {
-					main.checkMods();
-				} catch (Exception e) {
-					Log.error("Failed checkMods()", e);
-				}
-				try {
-					setupNewList();
-				} catch (Exception e) {
-					Log.error("Failed setupNewList()", e);
-				}
-				ModCache.cacheChanged = true;
-			} catch (Exception e) {
-				Log.error("Failed to refresh list.", e);
+			} else {
+				Log.warn("ModDir is empty!");
 			}
-		} else {
-			Log.warn("ModDir is empty!");
+			MainFrameOSX.abortRefresh = false;
+			
+		} else if(CurrentOS.getSystem() == "Windows") {
+			if(Engine.getModDirectory() != null || !Engine.getModDirectory().equals("")) {
+				
+				Properties p = ConfigManager.loadConfig(CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName());
+				if(Boolean.parseBoolean(p.getProperty("UseSameDir")) == true) 
+					Engine.setModDirectory(p.getProperty("GameDir"));				
+				else Engine.setModDirectory(p.getProperty("ModDir"));
+				
+				try {
+					MainFrameWin32.buttonRefresh.setVisible(false);
+					MainFrameWin32.buttonRefreshCancel.setVisible(true);
+					//MainFrameWin32.progressBar.setSelection(0);
+					try {
+						modList.resetList();
+					} catch (Exception e) {
+						Log.error("Failed resetList()", e);
+					}
+					try {
+						Engine.checkMods(MainFrameWin32.getDisplay(), MainFrameWin32.progressBar);
+					} catch (Exception e) {
+						Log.error("Failed checkMods()", e);
+					}
+					try {
+						setupNewList();
+					} catch (Exception e) {
+						Log.error("Failed setupNewList()", e);
+					}
+					ModCache.cacheChanged = true;
+				} catch (Exception e) {
+					Log.error("Failed to refresh list.", e);
+				}
+			} else {
+				Log.warn("ModDir is empty!");
+			}
+			Engine.abortRefresh = false;
 		}
-		MainFrame.abortRefresh = false;
 	}
 }

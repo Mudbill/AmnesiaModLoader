@@ -1,16 +1,16 @@
 package modloader;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Locale;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.MessageBox;
-
 public class CurrentOS {
 	
 	private static String system, gameExe, launcherExe, saveDir, config, portConfig, log, execExt;
+	private static String updateURL = "http://buttology.net/assets/other/modloader_version_win.txt";
+	private static final String gameExeDef = "Amnesia", launcherExeDef = "Launcher";
 		
 	/**
 	 * Constructor that determines the system that this application is being ran from.
@@ -40,29 +40,46 @@ public class CurrentOS {
 		
 		if(system == "Windows") {
 			execExt = ".exe";
-			saveDir = System.getProperty("user.dir");
-			//saveDir = System.getProperty("user.home") + File.separator + "AppData\\Roaming\\Amnesia Modloader";
+			//updateURL = "http://bit.ly/AML-latest-win";
 		}
-//		else if(system == "MacOS") {
-//			execExt = ".app";
-//			saveDir = System.getProperty("user.home") + File.separator + "Library/Application Support/Frictional Games/Amnesia/Modloader";
-//		}
+		else if(system == "MacOS") {
+			execExt = ".app";
+			updateURL = updateURL + "modloader_version_mac.txt";
+		}
 //		else if(system == "Linux") {
 //			execExt = ".bin";
-//			saveDir = System.getProperty("user.home") + File.separator + "Amnesia/Modloader";
+//			saveDir = System.getProperty("user.dir");
+//			updateURL = updateURL + "modloader_version_nux.txt";
 //		}
-
-		gameExe = "Amnesia";
-		launcherExe = "Launcher";
+		
+		saveDir = System.getProperty("user.dir");
+		gameExe = gameExeDef;
+		launcherExe = launcherExeDef;
 		config = "preferences.cfg";
 		portConfig = "port.cfg";
 		log = "log.log";
+		Engine.prefPath = saveDir + File.separator + config;
+		Engine.portPath = saveDir + File.separator + portConfig;
 		Log.info("\tSystem = " + system + ", preference directory = " + saveDir);
+	}
+	
+	public static String getUpdateURL() {
+		return updateURL;
+	}
+	
+	public static String getSystem()
+	{
+		return system;
 	}
 	
 	public static String getGameExe()
 	{
 		return gameExe + execExt;
+	}
+	
+	public static String getDefGameExe()
+	{
+		return gameExeDef + execExt;
 	}
 	
 	public static String getLauncherExe()
@@ -91,30 +108,16 @@ public class CurrentOS {
 	}
 	
 	/**
-	 * Global function for shutting down the application. Will check OS if Amnesia is running.
-	 */
-	public static boolean shutDown() {
-		if(gameRunning()) {
-			MessageBox m = new MessageBox(MainFrame.getShell(), SWT.SHEET | SWT.ICON_WARNING | SWT.YES | SWT.NO);
-			m.setText("Shutdown?");
-			m.setMessage("It looks like Amnesia might be running. If you shut down the Modloader now, it may not be able to install/uninstall any custom shaders that might be required by the mod. I recommend you shut down Amnesia first.\n\nDo you really want to exit now?");
-			if(m.open() != SWT.YES) {
-				return false;
-			}
-		}
-		
-		if(MainFrame.useCache) {
-			new ModCache().writeCache();			
-		}
-		Log.info("Closing application.");
-		return true;
-	}
-	
-	/**
 	 * Checks whether the game or launcher is currently running on the system.
 	 * @return
 	 */
 	public static boolean gameRunning() {
+		
+		if(system != "Windows") {
+			Log.info("Not running on Windows, skipping process check.");
+			return false;
+		}
+		
 		String line;
 		String pidInfo = "";
 		
@@ -155,9 +158,9 @@ public class CurrentOS {
 			gameExe = s;
 			launcherExe = s;				
 		} else {
-			gameExe = "Amnesia";
-			launcherExe = "Launcher";
+			gameExe = gameExeDef;
+			launcherExe = launcherExeDef;
 		}
-		MainFrame.editLaunch(s);
+		if(CurrentOS.getSystem() == "Windows") Engine.editLaunch(s, MainFrameWin32.buttonLaunch, MainFrameWin32.buttonLaunch2, MainFrameWin32.menuItemLauncher);
 	}
 }

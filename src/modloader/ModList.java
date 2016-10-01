@@ -37,10 +37,8 @@ public class ModList {
 	private Properties mainInit = new Properties();
 	private InputStream inputCFG = null;
 	private InputStream inputInit = null;
-	//private static File[] list;
 	public static int modsFoundTotal = 0;
 	private boolean cfgFound = false;
-	//private boolean found;
 
 	public ModList() {}
 	
@@ -53,7 +51,10 @@ public class ModList {
 		
 		modsFoundTotal = 0;
 		
-		MainFrame.tableMods.removeAll();
+		if(CurrentOS.getSystem() == "MacOS")
+		MainFrameOSX.tableMods.removeAll();
+		else if(CurrentOS.getSystem() == "Windows")
+		MainFrameWin32.tableMods.removeAll();
 		
 		listDataArr.clear();
 		index.clear();
@@ -67,11 +68,18 @@ public class ModList {
 		infoIgnoreShaders.clear();
 		listIcon.clear();
 		
-		MainFrame.getDisplay().syncExec(new Runnable() {
-			public void run() {
-				MainFrame.labelModAmount.setText("0");
-			}
-		});
+		if(CurrentOS.getSystem() == "MacOS")
+			MainFrameOSX.getDisplay().syncExec(new Runnable() {
+				public void run() {
+					MainFrameOSX.labelModAmount.setText("0");
+				}
+			});
+		else if(CurrentOS.getSystem() == "Windows")
+			MainFrameWin32.getDisplay().syncExec(new Runnable() {
+				public void run() {
+					MainFrameWin32.labelModAmount.setText("0");
+				}
+			});
 	}
 	
 	/**
@@ -255,7 +263,7 @@ public class ModList {
 				cfg.load(inputCFG);
 				if(cfg.getProperty("Author") != null) modAuthor = cfg.getProperty("Author"); 
 				if(cfg.getProperty("IconFile") != null) modIcon = cfg.getProperty("IconFile"); 
-				if(cfg.getProperty("Description") != null) modDesc = cfg.getProperty("Description").replace("â", "'"); //Patch odd formatting
+				if(cfg.getProperty("Description") != null) modDesc = cfg.getProperty("Description").replace("ï¿½", "'"); //Patch odd formatting
 				
 				try {
 					if(cfg.getProperty("MinVersion") != null) modMinVer = ""+Float.parseFloat(cfg.getProperty("MinVersion")); 
@@ -279,28 +287,47 @@ public class ModList {
 			
 			addModInfo(null);
 			
-			File iconFile = new File(cfgPath + File.separator + modIcon);
+			final File iconFile = new File(cfgPath + File.separator + modIcon);
 			listIcon.add(iconFile);
 						
 			modsFoundTotal += 1;
-			
-			MainFrame.getDisplay().syncExec(new Runnable() {
-				public void run() {
-					MainFrame.modItem = new TableItem(MainFrame.tableMods, SWT.NONE);
-					MainFrame.modItem.setFont(SWTResourceManager.getFont("System", 11, SWT.NORMAL));
-					MainFrame.modItem.setText(modTitle);
-					if(iconFile.exists() && iconFile.isFile()) {
-						Log.info("Applying icon: " + iconFile.toString());
-						Image image = new Image(Display.getDefault(), iconFile.toString());
-						MainFrame.modItem.setImage(Common.scale(image, MainFrame.getIconSize()));						
-					} else {
-						Log.warn("Icon file not found. Using default.");
-						MainFrame.modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrame.class, defIcon), MainFrame.getIconSize()));
+
+			if(CurrentOS.getSystem() == "MacOS")
+				MainFrameOSX.getDisplay().syncExec(new Runnable() {
+					public void run() {
+						MainFrameOSX.modItem = new TableItem(MainFrameOSX.tableMods, SWT.NONE);
+						MainFrameOSX.modItem.setFont(SWTResourceManager.getFont("System", 11, SWT.NORMAL));
+						MainFrameOSX.modItem.setText(modTitle);
+						if(iconFile.exists() && iconFile.isFile()) {
+							Log.info("Applying icon: " + iconFile.toString());
+							Image image = new Image(Display.getDefault(), iconFile.toString());
+							MainFrameOSX.modItem.setImage(Common.scale(image, Engine.getIconSize()));						
+						} else {
+							Log.warn("Icon file not found. Using default.");
+							MainFrameOSX.modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrameOSX.class, defIcon), Engine.getIconSize()));
+						}
+						listDataArr.add(MainFrameOSX.modItem);
+						MainFrameOSX.labelModAmount.setText(""+modsFoundTotal);
 					}
-					listDataArr.add(MainFrame.modItem);
-					MainFrame.labelModAmount.setText(""+modsFoundTotal);
-				}
-			});
+				});
+			if(CurrentOS.getSystem() == "Windows")
+				MainFrameWin32.getDisplay().syncExec(new Runnable() {
+					public void run() {
+						MainFrameWin32.modItem = new TableItem(MainFrameWin32.tableMods, SWT.NONE);
+						MainFrameWin32.modItem.setFont(SWTResourceManager.getFont("System", 11, SWT.NORMAL));
+						MainFrameWin32.modItem.setText(modTitle);
+						if(iconFile.exists() && iconFile.isFile()) {
+							Log.info("Applying icon: " + iconFile.toString());
+							Image image = new Image(Display.getDefault(), iconFile.toString());
+							MainFrameWin32.modItem.setImage(Common.scale(image, Engine.getIconSize()));						
+						} else {
+							Log.warn("Icon file not found. Using default.");
+							MainFrameWin32.modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrameWin32.class, defIcon), Engine.getIconSize()));
+						}
+						listDataArr.add(MainFrameWin32.modItem);
+						MainFrameWin32.labelModAmount.setText(""+modsFoundTotal);
+					}
+				});
 			
 			Log.info("Adding mod to list: " + this.getModTitle());
 			

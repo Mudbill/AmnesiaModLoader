@@ -8,6 +8,7 @@ import java.nio.file.Path;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ProgressBar;
 
@@ -15,12 +16,14 @@ public class FindFile extends Thread
 {	
 	private Display display;
 	private ProgressBar progressBar;
+//	private Label labelPath;
 	private File cfgPath;
 	private String cfgName;
 	private static boolean firstLoop = false;
 	public static boolean found;
 
-	public FindFile(Display display, ProgressBar progressBar, File cfgPath, String cfgName) {
+	public FindFile(Display display, ProgressBar progressBar, File cfgPath, String cfgName, Label labelPath) {
+//		this.labelPath = labelPath;
 		this.display = display;
 		this.progressBar = progressBar;
 		this.cfgPath = cfgPath;
@@ -36,13 +39,19 @@ public class FindFile extends Thread
 		
 		display.asyncExec(new Runnable() {
 			public void run() {
-				MainFrame.buttonRefresh.setVisible(true);
-				MainFrame.buttonRefreshCancel.setVisible(false);
+				if(CurrentOS.getSystem() == "MacOS") {
+					MainFrameOSX.buttonRefresh.setVisible(true);
+					MainFrameOSX.buttonRefreshCancel.setVisible(false);					
+				} else if(CurrentOS.getSystem() == "Windows") {
+					MainFrameWin32.buttonRefresh.setVisible(true);
+					MainFrameWin32.buttonRefreshCancel.setVisible(false);
+					MainFrameWin32.labelPath.setText("");
+				}
 				if (progressBar.isDisposed()) return;
 				progressBar.setVisible(false);
 				progressBar.setSelection(progressBar.getMaximum());
 				if(ModList.getModsFound() == 0) {
-					MessageBox m = new MessageBox(MainFrame.getShell(), SWT.ICON_WARNING);
+					MessageBox m = new MessageBox(Engine.getShell(), SWT.ICON_WARNING);
 					m.setText("No mods found");
 					m.setMessage("No mods were found in the specified directory. Double check the preferences, and make sure you have mods installed.");
 					m.open();
@@ -59,29 +68,36 @@ public class FindFile extends Thread
 	 */
 	private void findFile(String name, File file)
     {
-		if(MainFrame.abortRefresh) return;
+		if(CurrentOS.getSystem() == "MacOS") if(MainFrameOSX.abortRefresh) return;
+		else if(CurrentOS.getSystem() == "Windows") if(Engine.abortRefresh) return;
 		
         try (DirectoryStream<Path> list = Files.newDirectoryStream(file.toPath())) {
 			if (!firstLoop) {
 				//int i = Common.getFileAmount(file.toPath());
-				display.asyncExec(new Runnable() {
-					public void run() {
-						if (progressBar.isDisposed()) return;
-						progressBar.setMaximum(10000);
-						//Log.info("Files to scan = " + i);
-					}
-				});
+//				display.asyncExec(new Runnable() {
+//					public void run() {
+//						if (progressBar.isDisposed()) return;
+//						progressBar.setMaximum(10000);
+//						if(CurrentOS.getSystem() == "MacOS") progressBar.setMaximum(100);
+//						Log.info("Files to scan = " + i);
+//					}
+//				});
 				firstLoop = true;
 			}
-
+			
         	for (Path fil : list) {
-				display.asyncExec(new Runnable() {
-					public void run() {
-						if(progressBar.isDisposed()) return;
-						if(progressBar.getSelection() < progressBar.getMaximum() * 0.99)
-							progressBar.setSelection(progressBar.getSelection() + 1);
-					}
-				});
+        		
+//        		display.asyncExec(new Runnable() {
+//        			public void run() {
+//
+//        				labelPath.setText(fil.toString());
+////        				if(progressBar.isDisposed()) return;
+////        				if(progressBar.getSelection() < progressBar.getMaximum() * 0.99)
+////        					progressBar.setSelection(progressBar.getSelection() + 1);
+//        			}
+//        		});
+
+        		
         		if (Files.isDirectory(fil)) {
         			findFile(name, fil.toFile());
         		}

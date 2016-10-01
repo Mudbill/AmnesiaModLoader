@@ -1,0 +1,10 @@
+October 1st 2016 - version 1.6.3 - Windows
+
+- Added this update window to show up with a changelog when running after last boot was a different version.
+- Fixed launching mods using the Steam version of Amnesia. Now requires that you tick the "Use Steam" box in the options.
+- Rearranged preferences (options) to reflect the Mac version.
+  - This includes an "Advanced" page which includes a few more settings and warnings.
+- Added ability to check online for a newer update and then link to the forum post.
+  - I might add some auto-update installation in the future, but for now it only checks and prompts.
+- Organized a lot of the internal code to hopefully be easier to update/manage in the future.
+- Miscellaneous tweaks and bugfixes.

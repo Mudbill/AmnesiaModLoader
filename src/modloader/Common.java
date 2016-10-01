@@ -1,6 +1,8 @@
 package modloader;
 
+import java.awt.AWTException;
 import java.awt.Desktop;
+import java.awt.Robot;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
@@ -16,6 +18,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
+
+import com.sun.glass.events.KeyEvent;
 
 public class Common {
 
@@ -76,21 +80,24 @@ public class Common {
 				
 				@Override 
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-					if(MainFrame.abortRefresh) return null;
+					if(CurrentOS.getSystem() == "MacOS") if(MainFrameOSX.abortRefresh) return null;
+					else if(CurrentOS.getSystem() == "Windows") if(Engine.abortRefresh) return null;
 					files.addAndGet(1);
 					return FileVisitResult.CONTINUE;
 				}
 
 				@Override 
 				public FileVisitResult visitFileFailed(Path file, IOException exc) {
-					if(MainFrame.abortRefresh) return null;
+					if(CurrentOS.getSystem() == "MacOS") if(MainFrameOSX.abortRefresh) return null;
+					else if(CurrentOS.getSystem() == "Windows") if(Engine.abortRefresh) return null;
 					Log.info("Skipped file traversing: " + file + " (" + exc + ")");
 					return FileVisitResult.CONTINUE;
 				}
 
 				@Override 
 				public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
-					if(MainFrame.abortRefresh) return null;
+					if(CurrentOS.getSystem() == "MacOS") if(MainFrameOSX.abortRefresh) return null;
+					else if(CurrentOS.getSystem() == "Windows") if(Engine.abortRefresh) return null;
 					if (exc != null)
 						Log.warn("Had trouble traversing: " + dir + " (" + exc + ")");
 					return FileVisitResult.CONTINUE;
@@ -102,5 +109,28 @@ public class Common {
 			Log.info("Cancelled file scanning.");
 		}
 		return files.intValue();
+	}
+	
+	/**
+	 * Patch for SWT bug which displays hidden files by default on OS X. Manually inputs keyboard shortcut Shift+Cmd+Period to hide them.
+	 */
+	public static void toggleHiddenFiles() {
+		if(CurrentOS.getSystem() != "MacOS") return;
+		MainFrameOSX.getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				try {
+					Robot robot = new Robot();
+					robot.keyPress(157);
+					robot.keyPress(KeyEvent.VK_SHIFT);
+					robot.keyPress(KeyEvent.VK_PERIOD);
+
+					robot.keyRelease(157);
+					robot.keyRelease(KeyEvent.VK_SHIFT);
+					robot.keyRelease(KeyEvent.VK_PERIOD);
+				} catch (AWTException e) {
+					Log.error("", e);
+				}	
+			}
+		});
 	}
 }

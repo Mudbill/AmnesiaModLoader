@@ -20,17 +20,22 @@ public class Start {
 
 	public static void main(String[] args) {
 		try {
-			Log.info("Starting Amnesia Modloader version " + MainFrame.getVersion());
+			Log.info("Starting Amnesia Modloader version " + Engine.getVersion());
 			
 			new CurrentOS().setOSValues();
-
-			String prefPath = CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName();
-			String portPath = CurrentOS.getSaveDir() + File.separator + CurrentOS.getPortConfigName();
-			File dir = new File(prefPath).getParentFile();
-			dir.mkdirs();
 			
-			Properties p = ConfigManager.loadConfig(prefPath);
-			Properties p2 = ConfigManager.loadConfig(portPath);
+			String oldLogVer = Update.readVersionFromLog();
+			if(!oldLogVer.equals(Engine.getVersion()) && !oldLogVer.equals("")) {
+				Log.info("Previous log version does not match. First boot after update? Log version: " + oldLogVer);
+				ChangelogDialog ud = new ChangelogDialog(new Shell(), SWT.DIALOG_TRIM);
+				ud.open();
+			}
+						
+			File f = new File(Engine.prefPath).getParentFile();
+			if(!f.exists()) f.mkdirs();
+			
+			Properties p = ConfigManager.loadConfig(Engine.prefPath);
+			Properties p2 = ConfigManager.loadConfig(Engine.portPath);
 
 			if(p2 != null) {
 				try {
@@ -40,10 +45,10 @@ public class Start {
 				}
 				Log.info("\tPort = " + PORT);
 			} else {
-				if(!new File(portPath).exists()) {
+				if(!new File(Engine.portPath).exists()) {
 					p2 = new Properties();
 					p2.setProperty("Port", "9999");
-					ConfigManager.writeConfig(p2, portPath);
+					ConfigManager.writeConfig(p2, Engine.portPath);
 					Log.info("Writing default port settings.");
 				}
 			}
@@ -65,22 +70,42 @@ public class Start {
 					Log.info("\tGameDir = " + p.getProperty("GameDir"));
 					Log.info("\tModDir = " + modDir);
 				}
+								
 				File rootCfg = new File(p.getProperty("GameDir") + File.separator + "config" + File.separator + "modloader.cfg");
-				checkConfigFolder(rootCfg, Boolean.parseBoolean(p.getProperty("WarnConfig")));
+				if(!p.getProperty("GameDir").isEmpty()) checkConfigFolder(rootCfg, Boolean.parseBoolean(p.getProperty("WarnConfig")));
 				
-				MainFrame frame = new MainFrame();
-				MainFrame.setModDirectory(modDir);
-				frame.open();
+				if(CurrentOS.getSystem() == "MacOS") {
+					MainFrameOSX frame = new MainFrameOSX();
+					Engine.setModDirectory(modDir);
+					frame.open();
+				} else if(CurrentOS.getSystem() == "Windows") {
+					if(Boolean.parseBoolean(p.getProperty("CheckForUpdates"))) {
+						String s = Update.getLatestVersion();
+						if(Update.compareVersions(s)) {
+							if(Update.promptUpdate() == SWT.YES) return;
+						}
+					}
+					MainFrameWin32 frame = new MainFrameWin32();
+					Engine.setModDirectory(modDir);
+					frame.open();
+				}
+				
 			} else {
 				Log.info("Preferences not found, first startup?");
 
-				MessageBox m = new MessageBox(new Shell(), SWT.SHEET | SWT.ICON_INFORMATION);
-				m.setMessage("Welcome! Please specify some settings before continuing.\nThese can be changed later by selecting the \"Preferences\" button in the main window.");
+				MessageBox m = new MessageBox(new Shell(), SWT.ICON_INFORMATION);
+				m.setMessage("Welcome! Please specify some settings before continuing.\nThese can be changed later by selecting the \"Options\" button in the main window.");
 				m.setText("First time setup");
 				m.open();
 				
-				Preferences prefs = new Preferences(new Shell(), SWT.SHEET);
-				prefs.open();
+				if(CurrentOS.getSystem() == "MacOS") {
+					PreferencesOSX prefs = new PreferencesOSX(new Shell(), SWT.DIALOG_TRIM);
+					prefs.open();
+				} else if(CurrentOS.getSystem() == "Windows") {
+					PreferencesWin32 prefs = new PreferencesWin32(new Shell(), SWT.DIALOG_TRIM);
+					prefs.open();
+				}
+
 			}
 		} catch (Exception e) {
 			Log.error("", e);
@@ -90,13 +115,13 @@ public class Start {
 	}
 	
 	public static void checkConfigFolder(File rootCfg, boolean warn) {
-		MessageBox m = new MessageBox(new Shell(), SWT.SHEET | SWT.ICON_INFORMATION | SWT.YES | SWT.NO);
+		MessageBox m = new MessageBox(new Shell(), SWT.ICON_INFORMATION | SWT.YES | SWT.NO);
 
 		if (rootCfg.exists() && rootCfg != null) {
 			Log.info("\tRoot config found: " + rootCfg.getPath());
 			Properties rootConfig = ConfigManager.loadConfig(rootCfg.getPath());
 			try {
-				if(rootConfig.getProperty("CfgVersion").equals(MainFrame.getVersion())) {
+				if(rootConfig.getProperty("CfgVersion").equals(Engine.getVersion())) {
 					Log.info("\tRoot config version is up to date. Version: " + rootConfig.getProperty("CfgVersion"));
 					return;
 				} else {
@@ -110,16 +135,16 @@ public class Start {
 		} else {
 			Log.warn("\tRoot config file not found.");
 			m.setText("Config not found");
-			m.setMessage("Your specified game directory is lacking an important file for the Modloader to work. Shall I copy it there now? If not, the Modloader may not work properly.");
+			m.setMessage("Your specified game directory is lacking an important file that the Modloader uses. Shall I copy it there now? If not, the Modloader may not work optimally.");
 		}
 
 		
-		if(warn) if(m.open() != SWT.YES) return;
+		if(warn) if(rootCfg != null && m.open() != SWT.YES) return;
 		
 		try {
 			Files.copy(Start.class.getResourceAsStream("/resources/modloader.cfg"), Paths.get(rootCfg.getPath()), StandardCopyOption.REPLACE_EXISTING);
 			Files.copy(Start.class.getResourceAsStream("/resources/icon_default.png"), Paths.get(rootCfg.getParent() + File.separator + "default.png"), StandardCopyOption.REPLACE_EXISTING);
-			Log.info("\tCopied files from jar to config folder.");						
+			Log.info("\tCopied files from jar to config folder.");
 		} catch (IOException e) {
 			Log.error("", e);
 		}
@@ -131,7 +156,7 @@ public class Start {
 		}
 		catch (BindException e) {
 			Log.warn("Instance already running! Shutting down.");
-			MessageBox m = new MessageBox(new Shell(), SWT.SHEET | SWT.ICON_WARNING);
+			MessageBox m = new MessageBox(new Shell(), SWT.POP_UP | SWT.ICON_WARNING);
 			m.setMessage("Another instance of the application is running. To avoid conflicts, only one can run at a time.\n\nIf you believe this is an error, change the port settings.\nCurrent port: " + PORT);
 			m.setText("Duplicate Instance");
 			m.open();

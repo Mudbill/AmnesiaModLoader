@@ -1,0 +1,10 @@
+#Sat Oct 01 14:32:12 CEST 2016
+Icon=D\:\\SteamLibrary\\steamapps\\common\\Amnesia The Dark Descent\\Necrologue_eng\\config
+CompatMin=Undefined
+Launch=D\:\\SteamLibrary\\steamapps\\common\\Amnesia The Dark Descent\\Necrologue_eng\\config\\main_init.cfg
+Author=Anonymous
+Title=Penumbra\:Necrologue
+Exec=
+Shaders=No
+ShadersIgnore=false
+Desc=No description.
