@@ -1,6 +1,7 @@
 package modloader;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -75,6 +76,30 @@ public class ConfigManager {
 			try {
 				b.close();
 			} catch (Exception e) {}
+		}
+	}
+	
+	public static boolean clearPreferences() {
+		Log.info("Clearing old preferences...");
+		
+		try {
+			File pref = new File(Engine.prefPath);
+			File port = new File(Engine.portPath);
+			File log = new File(CurrentOS.getSaveDir() + File.separator + CurrentOS.getLogName());
+			File cacheFolder = new File(CurrentOS.getSaveDir() + File.separator + "cache");
+			
+			if(pref.exists()) pref.delete();
+			if(port.exists()) port.delete();
+			if(log.exists()) log.delete();
+			if(cacheFolder.isDirectory()) {
+				new ModCache().clearCache();
+				cacheFolder.delete();
+			}
+			
+			return true;
+		} catch (Exception e) {
+			Log.error("", e);
+			return false;
 		}
 	}
 }

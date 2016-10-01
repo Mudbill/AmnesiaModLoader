@@ -25,8 +25,30 @@ public class Shaders {
 		modDir = new File(modDir.getParent());
 		
 		modShaderDir = new File(modDir + File.separator + "core" + File.separator + "shaders");
-		rootShaderDir = new File(MainFrame.getGameDirectory() + File.separator + "core" + File.separator + "shaders");
-		rootBackupDir = new File(MainFrame.getGameDirectory() + File.separator + "core" + File.separator + "shaders_backup");
+		rootShaderDir = new File(MainFrameOSX.getGameDirectory() + File.separator + "core" + File.separator + "shaders");
+		rootBackupDir = new File(MainFrameOSX.getGameDirectory() + File.separator + "core" + File.separator + "shaders_backup");
+	}
+	
+	public static void promptRestore() {
+		
+		if(Shaders.installed) {
+			MessageBox m = new MessageBox(Engine.getShell(), SWT.OK | SWT.ICON_QUESTION);
+			m.setText("Restore Shaders?");
+			m.setMessage("Are you ready to restore the shaders? Please make sure you've closed the game, then click OK. The custom shaders will be uninstalled and the original ones restored.");
+			if(m.open() != -1) {
+				Log.info("Restore shaders!");
+				boolean b = Shaders.uninstallShaders();
+				MessageBox m2 = new MessageBox(Engine.getShell(), SWT.OK | SWT.ICON_INFORMATION);
+				if(b) {
+					m2.setText("Success");
+					m2.setMessage("The shaders were successfully restored!");
+				} else {
+					m2.setText("Failed");
+					m2.setMessage("The shaders could not be restored. You might have to do so manually.");
+				}
+				m2.open();
+			}
+		}
 	}
 	
 	public static boolean checkShaders()
@@ -42,8 +64,8 @@ public class Shaders {
 
 			if(rootShaderDir.isDirectory() && modShaderDir.isDirectory()) {
 								
-				if(MainFrame.getWarnShader()) {
-					MessageBox m = new MessageBox(MainFrame.getShell(), SWT.SHEET | SWT.YES | SWT.NO | SWT.CANCEL | SWT.ICON_INFORMATION);
+				if(MainFrameOSX.getWarnShader()) {
+					MessageBox m = new MessageBox(MainFrameOSX.getShell(), SWT.SHEET | SWT.YES | SWT.NO | SWT.CANCEL | SWT.ICON_INFORMATION);
 					m.setText("Install Shaders");
 					m.setMessage("This mod features custom shaders. Would you like to install them now? It's not recommended to play the mod without installing them.\n\n- Yes will install and launch.\n- No will skip installation and launch.\n- Cancel will not make any changes and not launch.");
 					int i = m.open();
@@ -136,7 +158,7 @@ public class Shaders {
 				return;
 			}
 		}
-		rootShaderDir = new File(MainFrame.getGameDirectory() + File.separator + "core" + File.separator + "shaders");
+		rootShaderDir = new File(MainFrameOSX.getGameDirectory() + File.separator + "core" + File.separator + "shaders");
 	}
 	
 	private static void deleteShaders()
@@ -160,7 +182,7 @@ public class Shaders {
 				Log.error("Exception", e);
 			}
 		}
-		rootShaderDir = new File(MainFrame.getGameDirectory() + File.separator + "core" + File.separator + "shaders");
+		rootShaderDir = new File(MainFrameOSX.getGameDirectory() + File.separator + "core" + File.separator + "shaders");
 	}
 	
 	public static boolean uninstallShaders()
