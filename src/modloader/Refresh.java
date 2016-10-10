@@ -101,6 +101,7 @@ public class Refresh {
 					}
 					try {
 						Engine.checkMods(MainFrameWin32.getDisplay(), MainFrameWin32.progressBar);
+						
 					} catch (Exception e) {
 						Log.error("Failed checkMods()", e);
 					}

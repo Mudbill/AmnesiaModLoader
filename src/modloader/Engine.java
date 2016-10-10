@@ -22,17 +22,18 @@ import org.eclipse.swt.widgets.Text;
 public class Engine {
 	
 	public static final String appName = "Amnesia Modloader";
-	public static final String appVersion = "1.6.3";
+	public static final String appVersion = "1.6.4";
 	public static final String cfgName = "main_init.cfg";
-	public static final String urlWeb = "http://www.buttology.net/downloads/amnesia-modloader";
+	public static final String urlWeb = "http://buttology.net/downloads/amnesia-modloader/";
 	public static final String urlForum = "https://www.frictionalgames.com/forum/thread-25806.html";
 	public static final String urlYoutube = "https://www.youtube.com/MrMudbill";
 	public static final String urlTwitter = "https://www.twitter.com/Mudbill";	
 
-	public static String prefPath;// = CurrentOS.getSaveDir() + File.separator + CurrentOS.getConfigName();
-	public static String portPath;// = CurrentOS.getSaveDir() + File.separator + CurrentOS.getPortConfigName();
+	public static String prefPath;
+	public static String portPath;
 
-	public static String modDirectory = "", gameDirectory = "";
+	public static boolean modSelected = false;
+	private static String modDirectory = "", gameDirectory = "";
 
 	public static boolean warnExec = true, warnShader = true, warnSteam = true;
 
@@ -63,6 +64,16 @@ public class Engine {
 			if(MainFrameOSX.getShell() != null) b = true;
 		}
 		return b;
+	}
+	
+	public static Label getLabelPath() {
+		if(CurrentOS.getSystem() == "Windows") {
+			return MainFrameWin32.labelPath;
+		}
+		if(CurrentOS.getSystem() == "MacOS") {
+			
+		}
+		return null;
 	}
 	
 	public static int getIconSize() {
@@ -171,13 +182,14 @@ public class Engine {
 	 */
 	public static void checkMods(Display display, ProgressBar progressBar)
 	{
+		modSelected = false;
 		try {
-			new FindFile(display, progressBar, new File(modDirectory), cfgName, MainFrameWin32.labelPath).start();
+			FindFile ff = new FindFile(display, progressBar, new File(modDirectory), cfgName);
+			ff.start();
 
 			if(display.isDisposed()) return;
 			if(modDirectory != null) {
 				progressBar.setVisible(true);
-				Log.info("Mods found: " + ModList.getModsFound());
 			}
 		} catch (Exception e) {
 			Log.error("Failed checking for mods.", e);			
@@ -189,6 +201,8 @@ public class Engine {
 	 */
 	public static void displayModInfo(Shell shell, Label labelTitle, Label labelAuthor, Label labelVer, Label labelShaderVal, Text textDesc)
 	{
+		modSelected = true;
+		
 		if(ModList.modsFoundTotal > 0) {
 			//Default entries.
 			String title = "Untitled";
@@ -223,6 +237,12 @@ public class Engine {
 			textDesc.setText(desc);
 			labelVer.setText(compatMin);
 			labelShaderVal.setText(shaders);
+			
+			String path = modList.getLaunchIndex(Refresh.getListIndex());
+			String relpath = path.substring(getModDirectory().length());
+			
+			getLabelPath().setText(relpath);
+			getLabelPath().setToolTipText(path);
 		} else {
 			MessageBox m = new MessageBox(shell, SWT.SHEET | SWT.ICON_WARNING);
 			m.setMessage("No mods were found in the specified directory. Double check the preferences.");

@@ -40,7 +40,7 @@ public class CurrentOS {
 		
 		if(system == "Windows") {
 			execExt = ".exe";
-			//updateURL = "http://bit.ly/AML-latest-win";
+			//updateURL = "http://notexistant.net/text.txt";
 		}
 		else if(system == "MacOS") {
 			execExt = ".app";

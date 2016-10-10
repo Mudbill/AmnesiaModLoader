@@ -2,12 +2,12 @@ package modloader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 
 public class Update {
@@ -15,7 +15,7 @@ public class Update {
 	public Update() {}
 	
 	public static String onlineVersion = "";
-	
+		
 	public static String getLatestVersion() {
 		try {
 			URL url = new URL(CurrentOS.getUpdateURL());
@@ -24,12 +24,9 @@ public class Update {
 			Log.info("Getting latest version number: " + version);
 			onlineVersion = version;
 			s.close();
-			return version;
-		} catch (MalformedURLException e) {
-			Log.error("", e);
-			return null;
-		} catch (IOException e) {
-			Log.error("", e);
+			return version;					
+		} catch (Exception e) {
+			Log.warn("Could not fetch current version. Offline?");
 			return null;
 		}
 	}
@@ -78,20 +75,26 @@ public class Update {
 		return false;
 	}
 	
-	public static int promptUpdate() {
-		MessageBox m = new MessageBox(Engine.getShell(), SWT.ICON_INFORMATION | SWT.YES | SWT.NO);
-		m.setText("Update available");
-		m.setMessage("There's an update available for download. Would you like to visit the download page?\n\nCurrent version: " + Engine.appVersion + "\nNew version: " + onlineVersion);
-		int i = m.open();
-		if(i == SWT.YES) {
-			try {
-				Log.info("Opening website: " + Engine.urlForum);
-				Common.openWebpage(new URL(Engine.urlForum));
-				Engine.getShell().close();
-			} catch (MalformedURLException e) {
-				Log.error("", e);
+	public static void promptUpdate() {
+		Display display = Display.getDefault();
+		display.asyncExec(new Runnable(){
+			@Override
+			public void run() {
+				MessageBox m = new MessageBox(Engine.getShell(), SWT.ICON_INFORMATION | SWT.YES | SWT.NO);
+				m.setText("Update available");
+				m.setMessage("There's an update available for download. Would you like to visit the download page?\n\nCurrent version: " + Engine.appVersion + "\nNew version: " + onlineVersion);
+				int i = m.open();
+				if(i == SWT.YES) {
+					try {
+						Log.info("Opening website: " + Engine.urlForum);
+						Common.openWebpage(new URL(Engine.urlForum));
+						Engine.getShell().close();
+					} catch (MalformedURLException e) {
+						Log.error("", e);
+					}
+				}
+				return;
 			}
-		}
-		return i;
+		});
 	}
 }
