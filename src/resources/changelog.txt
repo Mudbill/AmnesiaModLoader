@@ -1,3 +1,11 @@
+October 10th 2016 - version 1.6.4 - Windows
+- Fixed issue with update crashing the app while offline.
+- Added more multi-threading so that the app works a bit smoother.
+- Greatly improved scanning speed.
+- Added field below mod list to display scan progress/currently selected mod.
+- Added proposed default directory for first-time start.
+- Changed mod list font from "System" to "Consolas".
+
 October 1st 2016 - version 1.6.3 - Windows
 
 - Added this update window to show up with a changelog when running after last boot was a different version.

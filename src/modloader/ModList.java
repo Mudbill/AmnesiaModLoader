@@ -314,7 +314,7 @@ public class ModList {
 				MainFrameWin32.getDisplay().syncExec(new Runnable() {
 					public void run() {
 						MainFrameWin32.modItem = new TableItem(MainFrameWin32.tableMods, SWT.NONE);
-						MainFrameWin32.modItem.setFont(SWTResourceManager.getFont("System", 11, SWT.NORMAL));
+						MainFrameWin32.modItem.setFont(SWTResourceManager.getFont("Consolas", 11, SWT.NORMAL));
 						MainFrameWin32.modItem.setText(modTitle);
 						if(iconFile.exists() && iconFile.isFile()) {
 							Log.info("Applying icon: " + iconFile.toString());

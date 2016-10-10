@@ -143,30 +143,30 @@ public class ModCache {
 		String launch = col.get(8);
 		
 		TableItem modItem = new TableItem(MainFrameWin32.tableMods, SWT.NONE);
-		modItem.setFont(SWTResourceManager.getFont("System", 11, SWT.NORMAL));
+		modItem.setFont(SWTResourceManager.getFont("Consolas", 11, SWT.NORMAL));
 
 		try {
 			File iconFile = new File(icon);
 			
 			if(title.equals("")) {
 				title = "Untitled";
-				modItem.setFont(SWTResourceManager.getFont("System", 11, SWT.ITALIC));
+				modItem.setFont(SWTResourceManager.getFont("Consolas", 11, SWT.ITALIC));
 			}
 		
 			if(iconFile.exists() && iconFile.isFile())
 			{
 				//scale the image to specified size.
 				Image image = new Image(Display.getDefault(), iconFile.toString());
-				modItem.setImage(Common.scale(image, MainFrameOSX.getIconSize()));
+				modItem.setImage(Common.scale(image, Engine.getIconSize()));
 				
 			} else {
 				Log.warn("Icon file not found. Using default.");
-				modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrameOSX.class, ModList.defIcon), MainFrameOSX.getIconSize()));
+				modItem.setImage(Common.scale(SWTResourceManager.getImage(Engine.class, ModList.defIcon), Engine.getIconSize()));
 			}
 			
 		} catch(Exception e) {				
 			Log.error("\tFailed adding icon: " + icon, e);
-			modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrameOSX.class, ModList.defIcon), MainFrameOSX.getIconSize()));
+			modItem.setImage(Common.scale(SWTResourceManager.getImage(Engine.class, ModList.defIcon), Engine.getIconSize()));
 		}
 				
 		ModList.infoTitle.add(title);
@@ -178,15 +178,15 @@ public class ModCache {
 		ModList.infoIgnoreShaders.add(shadersIgnore); 
 		ModList.index.add(launch);
 		
-		Log.info("\tLoad cache title: " + title);
-		Log.info("\tLoad cache author: " + author);
-		Log.info("\tLoad cache desc: " + desc);
-		Log.info("\tLoad cache icon: " + icon);
-		Log.info("\tLoad cache compatMin: " + compatMin);
-		Log.info("\tLoad cache shaders: " + shaders);
-		Log.info("\tLoad cache shadersIgnore: " + shadersIgnore);
-		Log.info("\tLoad cache exec: " + exec);
-		Log.info("\tLoad cache launch: " + launch);
+//		Log.info("\tLoad cache title: " + title);
+//		Log.info("\tLoad cache author: " + author);
+//		Log.info("\tLoad cache desc: " + desc);
+//		Log.info("\tLoad cache icon: " + icon);
+//		Log.info("\tLoad cache compatMin: " + compatMin);
+//		Log.info("\tLoad cache shaders: " + shaders);
+//		Log.info("\tLoad cache shadersIgnore: " + shadersIgnore);
+//		Log.info("\tLoad cache exec: " + exec);
+//		Log.info("\tLoad cache launch: " + launch);
 		
 		modItem.setText(title);
 		ModList.modsFoundTotal += 1;

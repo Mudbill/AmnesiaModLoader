@@ -201,7 +201,7 @@ public class MainFrameOSX {
 	public void checkMods()
 	{
 		try {
-			new FindFile(display, progressBar, new File(modDirectory), cfgName, MainFrameWin32.labelPath).start();
+			new FindFile(display, progressBar, new File(modDirectory), cfgName).start();
 
 			if(display.isDisposed()) return;
 			if(modDirectory != null) {

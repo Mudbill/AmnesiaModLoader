@@ -23,14 +23,14 @@ public class Start {
 			Log.info("Starting Amnesia Modloader version " + Engine.getVersion());
 			
 			new CurrentOS().setOSValues();
-			
+						
 			String oldLogVer = Update.readVersionFromLog();
 			if(!oldLogVer.equals(Engine.getVersion()) && !oldLogVer.equals("")) {
 				Log.info("Previous log version does not match. First boot after update? Log version: " + oldLogVer);
 				ChangelogDialog ud = new ChangelogDialog(new Shell(), SWT.DIALOG_TRIM);
 				ud.open();
-			}
-						
+			}					
+
 			File f = new File(Engine.prefPath).getParentFile();
 			if(!f.exists()) f.mkdirs();
 			
@@ -56,7 +56,6 @@ public class Start {
 			checkIfRunning();
 			
 			if(p != null) {		
-				
 				String modDir;
 				
 				if(Boolean.parseBoolean(p.getProperty("UseSameDir")) == true) {
@@ -70,23 +69,30 @@ public class Start {
 					Log.info("\tGameDir = " + p.getProperty("GameDir"));
 					Log.info("\tModDir = " + modDir);
 				}
-								
+				
 				File rootCfg = new File(p.getProperty("GameDir") + File.separator + "config" + File.separator + "modloader.cfg");
 				if(!p.getProperty("GameDir").isEmpty()) checkConfigFolder(rootCfg, Boolean.parseBoolean(p.getProperty("WarnConfig")));
 				
+				Engine.setModDirectory(modDir);
+
+				if(Boolean.parseBoolean(p.getProperty("CheckForUpdates"))) {
+					Thread t = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							String s = Update.getLatestVersion();
+							if(s != null) if(Update.compareVersions(s)) {
+								Update.promptUpdate();
+							}
+						}
+					});
+					t.start();
+				}
+				
 				if(CurrentOS.getSystem() == "MacOS") {
 					MainFrameOSX frame = new MainFrameOSX();
-					Engine.setModDirectory(modDir);
 					frame.open();
 				} else if(CurrentOS.getSystem() == "Windows") {
-					if(Boolean.parseBoolean(p.getProperty("CheckForUpdates"))) {
-						String s = Update.getLatestVersion();
-						if(Update.compareVersions(s)) {
-							if(Update.promptUpdate() == SWT.YES) return;
-						}
-					}
 					MainFrameWin32 frame = new MainFrameWin32();
-					Engine.setModDirectory(modDir);
 					frame.open();
 				}
 				

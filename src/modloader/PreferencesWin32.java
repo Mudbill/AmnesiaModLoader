@@ -82,13 +82,13 @@ public class PreferencesWin32 extends Dialog {
 		} catch (Exception e1) {
 			Log.error("", e1);
 		}
-		shell.setSize(560, 500);
+		shell.setSize(560, 510);
 		shell.setText("Options");
 		shell.setLayout(null);
 		if(!Engine.getFrameInit())Common.center(shell);
 		
 		tabFolder = new TabFolder(shell, SWT.NONE);
-		tabFolder.setBounds(10, 10, 534, 423);
+		tabFolder.setBounds(10, 10, 534, 433);
 		
 		panelGeneral = new Composite(tabFolder, SWT.NONE);
 		panelGeneral.setLayout(null);
@@ -188,10 +188,10 @@ public class PreferencesWin32 extends Dialog {
 		});
 		Group groupOther = new Group(panelAdvanced, SWT.NONE);
 		groupOther.setText("Other");
-		groupOther.setBounds(10, 205, 494, 182);
+		groupOther.setBounds(10, 205, 494, 192);
 		
 		buttonClearCache = new Button(groupOther, SWT.NONE);
-		buttonClearCache.setLocation(254, 116);
+		buttonClearCache.setLocation(254, 126);
 		buttonClearCache.setSize(230, 56);
 		buttonClearCache.setEnabled(false);
 		buttonClearCache.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -208,7 +208,7 @@ public class PreferencesWin32 extends Dialog {
 		buttonClearSettings = new Button(groupOther, SWT.NONE);
 		buttonClearSettings.setImage(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_reload.png"));
 		buttonClearSettings.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		buttonClearSettings.setBounds(10, 116, 230, 56);
+		buttonClearSettings.setBounds(10, 126, 230, 56);
 		buttonClearSettings.setText("Reset preferences");
 		buttonClearSettings.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -230,13 +230,43 @@ public class PreferencesWin32 extends Dialog {
 		buttonUpdate.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				boolean b = Update.compareVersions(Update.getLatestVersion());
-				if(!b) {
-					MessageBox m = new MessageBox(shell, SWT.ICON_INFORMATION);
-					m.setText("Update");
-					m.setMessage("Already up to date! Most recent version: " + Update.onlineVersion);
-					m.open();
-				} else Update.promptUpdate();
+				buttonUpdate.setEnabled(false);
+				Thread t = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						boolean b = false;
+						try {
+							b = Update.compareVersions(Update.getLatestVersion());
+						} catch (NullPointerException e) {
+							Log.warn("Could not fetch online version.");
+							Display display = Display.getDefault();
+							display.asyncExec(new Runnable() {
+								public void run() {
+									MessageBox m = new MessageBox(Engine.getShell(), SWT.ICON_WARNING);
+									m.setText("Update");
+									m.setMessage("Could not fetch online version. Make sure you're connected to the Internet and try again.");
+									m.open();
+									if(!buttonUpdate.isDisposed()) buttonUpdate.setEnabled(true);
+								}
+							});
+							return;
+						}
+
+						if(!b) {
+							Display display = Display.getDefault();
+							display.asyncExec(new Runnable() {
+								public void run() {
+									MessageBox m = new MessageBox(Engine.getShell(), SWT.ICON_INFORMATION);
+									m.setText("Update");
+									m.setMessage("Already up to date! Most recent version: " + Update.onlineVersion);
+									m.open();
+									if(!buttonUpdate.isDisposed()) buttonUpdate.setEnabled(true);
+								}
+							});
+						} else Update.promptUpdate();
+					}
+				});
+				t.start();
 			}
 		});
 		
@@ -263,7 +293,7 @@ public class PreferencesWin32 extends Dialog {
 		labelAuthor.setText("Developed by Mudbill");
 		
 		buttonWeb = new Button(panelAbout, SWT.NONE);
-		buttonWeb.setBounds(10, 300, 250, 55);
+		buttonWeb.setBounds(10, 303, 250, 55);
 		buttonWeb.setToolTipText(Engine.urlWeb);
 		buttonWeb.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		buttonWeb.setText("View online page");
@@ -280,7 +310,7 @@ public class PreferencesWin32 extends Dialog {
 		
 		buttonForum = new Button(panelAbout, SWT.NONE);
 		buttonForum.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		buttonForum.setBounds(266, 300, 250, 55);
+		buttonForum.setBounds(266, 303, 250, 55);
 		buttonForum.setText("View forum thread");
 		buttonForum.setToolTipText(Engine.urlForum);
 		buttonForum.addSelectionListener(new SelectionAdapter() {
@@ -297,7 +327,7 @@ public class PreferencesWin32 extends Dialog {
 		buttonTwitter = new Button(panelAbout, SWT.NONE);
 		buttonTwitter.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		buttonTwitter.setImage(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_twitter.png"));
-		buttonTwitter.setBounds(458, 361, 26, 26);
+		buttonTwitter.setBounds(458, 371, 26, 26);
 		buttonTwitter.setToolTipText(Engine.urlTwitter);
 		buttonTwitter.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -313,7 +343,7 @@ public class PreferencesWin32 extends Dialog {
 		buttonYoutube = new Button(panelAbout, SWT.NONE);
 		buttonYoutube.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		buttonYoutube.setImage(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_youtube.png"));
-		buttonYoutube.setBounds(490, 361, 26, 26);
+		buttonYoutube.setBounds(490, 371, 26, 26);
 		buttonYoutube.setToolTipText(Engine.urlYoutube);
 		buttonYoutube.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -327,18 +357,18 @@ public class PreferencesWin32 extends Dialog {
 		});
 		
 		labelPromo = new Label(panelAbout, SWT.NONE);
-		labelPromo.setBounds(10, 368, 172, 13);
+		labelPromo.setBounds(10, 378, 172, 13);
 		labelPromo.setText("You can find me here:");
 		
 		labelEmail = new Label(panelAbout, SWT.NONE);
 		labelEmail.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.ITALIC));
 		labelEmail.setAlignment(SWT.RIGHT);
-		labelEmail.setBounds(300, 365, 152, 17);
+		labelEmail.setBounds(300, 375, 152, 17);
 		labelEmail.setText("mudbill@buttology.net");
 		
 		ScrolledComposite scrolledComposite = new ScrolledComposite(panelAbout, SWT.BORDER | SWT.V_SCROLL);
 		scrolledComposite.setExpandVertical(true);
-		scrolledComposite.setBounds(10, 52, 506, 242);
+		scrolledComposite.setBounds(10, 52, 506, 245);
 		scrolledComposite.setExpandHorizontal(true);
 		
 		ShellAboutWin32 shellAbout = new ShellAboutWin32(scrolledComposite, SWT.NONE);
@@ -467,7 +497,7 @@ public class PreferencesWin32 extends Dialog {
 		});
 
 		groupMisc = new Group(panelGeneral, SWT.NONE);
-		groupMisc.setBounds(10, 210, 320, 177);
+		groupMisc.setBounds(10, 210, 320, 187);
 		groupMisc.setText("Preferences");
 		groupMisc.setLayout(null);
 		
@@ -492,7 +522,7 @@ public class PreferencesWin32 extends Dialog {
 		});
 
 		groupIcon = new Group(panelGeneral, SWT.NONE);
-		groupIcon.setBounds(336, 210, 180, 177);
+		groupIcon.setBounds(336, 210, 180, 187);
 		groupIcon.setText("Icon size");
 		groupIcon.setLayout(null);
 		
@@ -567,7 +597,7 @@ public class PreferencesWin32 extends Dialog {
 		radioGame.setText("Direct game");
 				
 		buttonOK = new Button(shell, SWT.NONE);
-		buttonOK.setBounds(378, 439, 80, 23);
+		buttonOK.setBounds(378, 449, 80, 23);
 		buttonOK.setText("Save");
 		shell.setDefaultButton(buttonOK);
 		buttonOK.addSelectionListener(new SelectionAdapter() {
@@ -578,13 +608,12 @@ public class PreferencesWin32 extends Dialog {
 		});
 		
 		buttonCancel = new Button(shell, SWT.NONE);
-		buttonCancel.setBounds(464, 439, 80, 23);
+		buttonCancel.setBounds(464, 449, 80, 23);
 		buttonCancel.setText("Cancel");
 		buttonCancel.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				Log.info("Preferences cancelled.");
-				//isOpen = false;
 				shell.close();
 			}
 		});
@@ -604,6 +633,19 @@ public class PreferencesWin32 extends Dialog {
 			buttonMinimize.setSelection(false);
 			buttonRefreshBoot.setSelection(false);
 			checkUpdate.setSelection(true);
+			
+			File 				 f = new File("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Amnesia The Dark Descent");
+			if(!f.isDirectory()) f = new File("C:\\Program Files\\Steam\\steamapps\\common\\Amnesia The Dark Descent");
+			if(!f.isDirectory()) f = new File("D:\\SteamLibrary\\steamapps\\common\\Amnesia The Dark Descent");
+			if(!f.isDirectory()) f = new File("E:\\SteamLibrary\\steamapps\\common\\Amnesia The Dark Descent");
+			if(!f.isDirectory()) f = new File("C:\\Program Files (x86)\\Amnesia The Dark Descent\\redist");
+			if(!f.isDirectory()) f = new File("C:\\Program Files\\Amnesia The Dark Descent\\redist");
+			if(!f.isDirectory()) f = new File("D:\\Program Files (x86)\\Amnesia The Dark Descent\\redist");
+			if(!f.isDirectory()) f = new File("D:\\Program Files\\Amnesia The Dark Descent\\redist");
+			if(f.isDirectory()) {
+				Log.info("Assuming default install dir: " + f.getAbsolutePath());
+				textGameDir.setText(f.getAbsolutePath());
+			} else Log.info("No proposed directory found.");
 		} else {
 			boolean update = true;
 			boolean useSameDir = true;

@@ -114,7 +114,7 @@ public class MainFrameWin32 {
 		try {
 			Properties p = ConfigManager.loadConfig(Engine.prefPath);
 				
-			Engine.gameDirectory = p.getProperty("GameDir");
+			Engine.setGameDirectory(p.getProperty("GameDir"));
 			Engine.refreshBoot = Boolean.parseBoolean(p.getProperty("RefreshOnStartup"));
 			Engine.useCache = Boolean.parseBoolean(p.getProperty("UseCache"));
 			Engine.useSteam = Boolean.parseBoolean(p.getProperty("UseSteam"));
@@ -231,17 +231,13 @@ public class MainFrameWin32 {
 		});
 		
 		shell.setBackgroundMode(SWT.INHERIT_FORCE);
-		labelPath = new Label(shell, SWT.NONE);
-		labelPath.setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		labelPath.setBounds(126, 39, 561, 13);
-		labelPath.setText("");
 		
 		rightPanel = new Composite(shell, SWT.BORDER);
-		rightPanel.setBounds(344, 219, 343, 289);
+		rightPanel.setBounds(344, 203, 343, 305);
 		rightPanel.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		
 		leftPanel = new Composite(shell, SWT.BORDER);
-		leftPanel.setBounds(10, 219, 328, 289);
+		leftPanel.setBounds(10, 203, 328, 305);
 		leftPanel.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		leftPanel.setBackgroundMode(SWT.INHERIT_FORCE);
 		
@@ -255,7 +251,7 @@ public class MainFrameWin32 {
 		textDesc = new Text(rightPanel, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
 		textDesc.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		textDesc.setText("This is the description of the mod selected in the list to the right.");
-		textDesc.setBounds(10, 59, 319, 174);
+		textDesc.setBounds(10, 59, 319, 196);
 		
 		labelAuthor = new Label(rightPanel, SWT.NONE);
 		labelAuthor.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
@@ -265,31 +261,34 @@ public class MainFrameWin32 {
 		
 		labelReq = new Label(rightPanel, SWT.NONE);
 		labelReq.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
-		labelReq.setBounds(10, 260, 200, 15);
+		labelReq.setBounds(10, 278, 200, 13);
 		labelReq.setText("Required game version:");
 		
 		labelVer = new Label(rightPanel, SWT.NONE);
 		labelVer.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		labelVer.setFont(SWTResourceManager.getFont("Segoe UI", 8, SWT.BOLD));
 		labelVer.setAlignment(SWT.RIGHT);
-		labelVer.setBounds(216, 261, 113, 13);
+		labelVer.setBounds(216, 278, 113, 13);
 		labelVer.setText("Undefined");
 		
 		labelShader = new Label(rightPanel, SWT.NONE);
 		labelShader.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
-		labelShader.setBounds(10, 239, 200, 15);
+		labelShader.setBounds(10, 259, 200, 13);
 		labelShader.setText("Custom shaders:");
 		
 		labelShaderVal = new Label(rightPanel, SWT.NONE);
 		labelShaderVal.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		labelShaderVal.setFont(SWTResourceManager.getFont("Segoe UI", 8, SWT.BOLD));
 		labelShaderVal.setAlignment(SWT.RIGHT);
-		labelShaderVal.setBounds(216, 240, 113, 15);
+		labelShaderVal.setBounds(216, 259, 113, 13);
 		labelShaderVal.setText("Undefined");
 		leftPanel.setLayout(null);
 		
+		sep = new Label(leftPanel, SWT.SEPARATOR | SWT.HORIZONTAL);
+		sep.setBounds(0, 251, 324, 2);
+		
 		tableMods = new Table(leftPanel, SWT.FULL_SELECTION);
-		tableMods.setBounds(0, 4, 324, 246);
+		tableMods.setBounds(0, 4, 324, 245);
 		tableMods.setBackgroundMode(SWT.INHERIT_FORCE);
 		tableMods.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		tableMods.addSelectionListener(new SelectionAdapter() {
@@ -305,18 +304,15 @@ public class MainFrameWin32 {
 				else Engine.launchMod(shell, CurrentOS.getLauncherExe());
 			}
 		});
-		
-		sep = new Label(leftPanel, SWT.SEPARATOR | SWT.HORIZONTAL);
-		sep.setBounds(0, 251, 324, 2);
 		columnMods = new TableColumn(tableMods, SWT.NONE);
 		columnMods.setWidth(307);
 		columnMods.setText("Mods");
 		labelModsFound = new Label(leftPanel, SWT.NONE);
-		labelModsFound.setBounds(10, 260, 151, 13);
+		labelModsFound.setBounds(10, 278, 151, 13);
 		labelModsFound.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		labelModsFound.setText("Mods found:");
 		labelModAmount = new Label(leftPanel, SWT.RIGHT);
-		labelModAmount.setBounds(167, 260, 147, 13);
+		labelModAmount.setBounds(167, 278, 147, 13);
 		labelModAmount.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		labelModAmount.setText("0");
 		
@@ -357,10 +353,11 @@ public class MainFrameWin32 {
 		progressBar = new ProgressBar(shell, SWT.SMOOTH | SWT.INDETERMINATE);
 		progressBar.setBounds(126, 12, 561, 21);
 		progressBar.setVisible(false);
-		//progressBar.setMaximum(2000);
-		//progressBar.setVisible(true);
 		
 		Engine.setup(tableMods, menuList2);
+		labelPath = new Label(leftPanel, SWT.NONE);
+		labelPath.setFont(SWTResourceManager.getFont("Consolas", 8, SWT.NORMAL));
+		labelPath.setBounds(10, 259, 304, 13);
 	}
 	
 	/**
