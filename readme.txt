@@ -1,4 +1,4 @@
-Amnesia Modloader v1.6.0
+Amnesia Modloader v1.6.4
 
 ================
 
