@@ -7,9 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import mslinks.ShellLink;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -22,7 +25,7 @@ import org.eclipse.swt.widgets.Text;
 public class Engine {
 	
 	public static final String appName = "Amnesia Modloader";
-	public static final String appVersion = "1.6.4";
+	public static final String appVersion = "1.6.5";
 	public static final String cfgName = "main_init.cfg";
 	public static final String urlWeb = "http://buttology.net/downloads/amnesia-modloader/";
 	public static final String urlForum = "https://www.frictionalgames.com/forum/thread-25806.html";
@@ -74,6 +77,35 @@ public class Engine {
 			
 		}
 		return null;
+	}
+	
+	public static void createShortcut() {
+		try {	
+			FileDialog fd = new FileDialog(Engine.getShell(), SWT.SAVE);
+			fd.setFilterExtensions(new String[]{"*.lnk"});
+			fd.setFilterNames(new String[]{"Shortcuts (*.lnk)"});
+			fd.setOverwrite(true);
+			fd.setText("Select where to save your shortcut");
+			fd.setFileName(modList.getModTitle(Refresh.getListIndex()));
+			fd.setFilterPath(Engine.getGameDirectory());
+			String result = fd.open();
+			
+			if(result != null) {
+				ShellLink sl = ShellLink.createLink(gameDirectory + File.separator + CurrentOS.getGameExe())
+						.setCMDArgs(modList.getLaunchIndex(Refresh.getListIndex()))
+						.setWorkingDir(gameDirectory);
+				sl.getHeader().setIconIndex(128);
+				sl.getConsoleData()
+				.setFont(mslinks.extra.ConsoleData.Font.Consolas)
+				.setFontSize(24)
+				.setTextColor(5);
+				sl.saveTo(result);
+				sl.setIconLocation(System.getProperty("user.dir") + File.separator + "modloader.exe");
+				Log.info("Writing .lnk shortcut file to: " + result);
+			}			
+		} catch (IOException e) {
+			Log.error("", e);
+		}
 	}
 	
 	public static int getIconSize() {
@@ -354,10 +386,11 @@ public class Engine {
 					shell.setMinimized(true);
 				}
 				
-				new PatchConfig().checkConfig(filePath);
-				if(PatchConfig.abort) return;
-				if(!CurrentOS.getGameExe().equals(CurrentOS.getDefGameExe())) Engine.useSteam = false;
+//				new PatchConfig().checkConfig(filePath);
+//				if(PatchConfig.abort) return;
 				
+				if(!CurrentOS.getGameExe().equals(CurrentOS.getDefGameExe())) Engine.useSteam = false;
+								
 				if(Engine.useSteam) {
 					if(Boolean.parseBoolean(p.getProperty("WarnSteam"))) {
 						MessageBox m = new MessageBox(MainFrameWin32.getShell(), SWT.SHEET | SWT.OK | SWT.ICON_WARNING);

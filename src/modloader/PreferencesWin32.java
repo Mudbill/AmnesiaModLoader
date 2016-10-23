@@ -42,7 +42,7 @@ public class PreferencesWin32 extends Dialog {
 	private Label labelGameDir, labelModDir, labelName, labelVer, labelAuthor, iconPreview, labelSize, labelPrimary, labelEmail, labelPromo;
 	private Group groupMisc, groupDir, groupIcon;
 	private Scale slider;
-	private Button checkWarnConfig, checkWarnSteam, checkWarnCustomExec, checkWarnShaders, checkWarnPatch, checkUpdate;
+	private Button checkWarnConfig, checkWarnSteam, checkWarnCustomExec, checkWarnShaders, checkUpdate;
 	private Button buttonClearSettings;
 	private Button buttonUpdate;
 	
@@ -82,13 +82,13 @@ public class PreferencesWin32 extends Dialog {
 		} catch (Exception e1) {
 			Log.error("", e1);
 		}
-		shell.setSize(560, 510);
+		shell.setSize(560, 478);
 		shell.setText("Options");
 		shell.setLayout(null);
 		if(!Engine.getFrameInit())Common.center(shell);
 		
 		tabFolder = new TabFolder(shell, SWT.NONE);
-		tabFolder.setBounds(10, 10, 534, 433);
+		tabFolder.setBounds(10, 10, 534, 401);
 		
 		panelGeneral = new Composite(tabFolder, SWT.NONE);
 		panelGeneral.setLayout(null);
@@ -130,11 +130,6 @@ public class PreferencesWin32 extends Dialog {
 		checkWarnSteam.setBounds(10, 106, 16, 18);
 		checkWarnSteam.setText("Display a warning about Steam pop-ups when launching a mod\nthrough Steam.");
 		
-		checkWarnPatch = new Button(groupWarnings, SWT.CHECK);
-		checkWarnPatch.setSelection(true);
-		checkWarnPatch.setBounds(10, 130, 16, 33);
-		checkWarnPatch.setText("Display a warning about patching mods to work with Amnesia update 1.3. \nDisabling this will automatically patch new out-of-date configs.");
-		
 		Label labelWarnExec = new Label(groupWarnings, SWT.WRAP);
 		labelWarnExec.addMouseListener(new MouseAdapter() {
 			@Override
@@ -158,7 +153,7 @@ public class PreferencesWin32 extends Dialog {
 		});
 		Label labelWarnConfig = new Label(groupWarnings, SWT.WRAP);
 		labelWarnConfig.setBounds(32, 82, 452, 18);
-		labelWarnConfig.setText("Display a warning before updating the config file (upon new releases).");
+		labelWarnConfig.setText("Display a warning before updating the Modloader config file (upon new releases).");
 		labelWarnConfig.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent arg0) {
@@ -176,22 +171,12 @@ public class PreferencesWin32 extends Dialog {
 				else checkWarnSteam.setSelection(true);
 			}
 		});
-		Label labelWarnPatch = new Label(groupWarnings, SWT.WRAP);
-		labelWarnPatch.setBounds(32, 130, 452, 33);
-		labelWarnPatch.setText("Display a warning about patching mods to work with Amnesia update 1.3. Disabling this will automatically patch new out-of-date configs.");
-		labelWarnPatch.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent arg0) {
-				if(checkWarnPatch.getSelection()) checkWarnPatch.setSelection(false);
-				else checkWarnPatch.setSelection(true);
-			}
-		});
 		Group groupOther = new Group(panelAdvanced, SWT.NONE);
 		groupOther.setText("Other");
-		groupOther.setBounds(10, 205, 494, 192);
+		groupOther.setBounds(10, 205, 494, 152);
 		
 		buttonClearCache = new Button(groupOther, SWT.NONE);
-		buttonClearCache.setLocation(254, 126);
+		buttonClearCache.setLocation(254, 88);
 		buttonClearCache.setSize(230, 56);
 		buttonClearCache.setEnabled(false);
 		buttonClearCache.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -208,7 +193,7 @@ public class PreferencesWin32 extends Dialog {
 		buttonClearSettings = new Button(groupOther, SWT.NONE);
 		buttonClearSettings.setImage(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_reload.png"));
 		buttonClearSettings.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		buttonClearSettings.setBounds(10, 126, 230, 56);
+		buttonClearSettings.setBounds(10, 88, 230, 56);
 		buttonClearSettings.setText("Reset preferences");
 		buttonClearSettings.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -244,7 +229,7 @@ public class PreferencesWin32 extends Dialog {
 								public void run() {
 									MessageBox m = new MessageBox(Engine.getShell(), SWT.ICON_WARNING);
 									m.setText("Update");
-									m.setMessage("Could not fetch online version. Make sure you're connected to the Internet and try again.");
+									m.setMessage("Could not fetch online version. Make sure you're connected to the Internet and try again. It could also be my fault :'(");
 									m.open();
 									if(!buttonUpdate.isDisposed()) buttonUpdate.setEnabled(true);
 								}
@@ -274,6 +259,38 @@ public class PreferencesWin32 extends Dialog {
 		checkUpdate.setBounds(10, 21, 348, 16);
 		checkUpdate.setText("Check for updates automatically when starting application");
 		
+		buttonUseSteam = new Button(groupOther, SWT.CHECK);
+		buttonUseSteam.setBounds(10, 43, 348, 18);
+		buttonUseSteam.setToolTipText("This will change how the Modloader launches the game, by invoking the Steam protocol instead.");
+		buttonUseSteam.setText("Use Steam to launch the game");
+		buttonApplyShader = new Button(groupOther, SWT.CHECK);
+		buttonApplyShader.setBounds(10, 67, 273, 16);
+		buttonApplyShader.setToolTipText("If the Modloader should automatically install custom shaders when starting a mod. It will also uninstall the shaders when done.");
+		buttonApplyShader.setText("Apply custom shaders upon launch (if available)");
+		buttonApplyShader.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				if(buttonApplyShader.getSelection()) {
+					MessageBox m = new MessageBox(shell, SWT.SHEET | SWT.OK | SWT.ICON_WARNING);
+					m.setMessage("Disclaimer:\nThis is currently an experimental feature. This means that, although everything should work fine, I have not tested it enough to confirm this. It will modify some files in your Amnesia directory. It creates a backup, but I recommend you create one yourself in case of malfunction. The folder that is modified is named \"shaders\" and the backup name will be \"shaders_backup\". Other files are left alone.\n\nIf you find an issue, please report it to me so I can fix it, but keep in mind that you're on your own if things go wrong.");
+					m.setText("Beta Feature");
+					m.open();
+				}
+			}
+		});
+		buttonUseSteam.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				if(buttonUseSteam.getSelection()) {
+					radioGame.setEnabled(false);
+					radioLauncher.setEnabled(false);
+				} else {
+					radioGame.setEnabled(true);
+					radioLauncher.setEnabled(true);
+				}
+			}
+		});
+		
 		tabAbout = new TabItem(tabFolder, SWT.NONE);
 		tabAbout.setText("About");
 		tabAbout.setControl(panelAbout);
@@ -293,7 +310,7 @@ public class PreferencesWin32 extends Dialog {
 		labelAuthor.setText("Developed by Mudbill");
 		
 		buttonWeb = new Button(panelAbout, SWT.NONE);
-		buttonWeb.setBounds(10, 303, 250, 55);
+		buttonWeb.setBounds(10, 281, 250, 55);
 		buttonWeb.setToolTipText(Engine.urlWeb);
 		buttonWeb.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		buttonWeb.setText("View online page");
@@ -310,7 +327,7 @@ public class PreferencesWin32 extends Dialog {
 		
 		buttonForum = new Button(panelAbout, SWT.NONE);
 		buttonForum.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-		buttonForum.setBounds(266, 303, 250, 55);
+		buttonForum.setBounds(266, 281, 250, 55);
 		buttonForum.setText("View forum thread");
 		buttonForum.setToolTipText(Engine.urlForum);
 		buttonForum.addSelectionListener(new SelectionAdapter() {
@@ -327,7 +344,7 @@ public class PreferencesWin32 extends Dialog {
 		buttonTwitter = new Button(panelAbout, SWT.NONE);
 		buttonTwitter.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		buttonTwitter.setImage(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_twitter.png"));
-		buttonTwitter.setBounds(458, 371, 26, 26);
+		buttonTwitter.setBounds(458, 339, 26, 26);
 		buttonTwitter.setToolTipText(Engine.urlTwitter);
 		buttonTwitter.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -343,7 +360,7 @@ public class PreferencesWin32 extends Dialog {
 		buttonYoutube = new Button(panelAbout, SWT.NONE);
 		buttonYoutube.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		buttonYoutube.setImage(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_youtube.png"));
-		buttonYoutube.setBounds(490, 371, 26, 26);
+		buttonYoutube.setBounds(490, 339, 26, 26);
 		buttonYoutube.setToolTipText(Engine.urlYoutube);
 		buttonYoutube.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -357,18 +374,18 @@ public class PreferencesWin32 extends Dialog {
 		});
 		
 		labelPromo = new Label(panelAbout, SWT.NONE);
-		labelPromo.setBounds(10, 378, 172, 13);
+		labelPromo.setBounds(10, 346, 172, 13);
 		labelPromo.setText("You can find me here:");
 		
 		labelEmail = new Label(panelAbout, SWT.NONE);
 		labelEmail.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.ITALIC));
 		labelEmail.setAlignment(SWT.RIGHT);
-		labelEmail.setBounds(300, 375, 152, 17);
+		labelEmail.setBounds(300, 343, 152, 17);
 		labelEmail.setText("mudbill@buttology.net");
 		
 		ScrolledComposite scrolledComposite = new ScrolledComposite(panelAbout, SWT.BORDER | SWT.V_SCROLL);
 		scrolledComposite.setExpandVertical(true);
-		scrolledComposite.setBounds(10, 52, 506, 245);
+		scrolledComposite.setBounds(10, 52, 506, 223);
 		scrolledComposite.setExpandHorizontal(true);
 		
 		ShellAboutWin32 shellAbout = new ShellAboutWin32(scrolledComposite, SWT.NONE);
@@ -381,45 +398,45 @@ public class PreferencesWin32 extends Dialog {
 		});
 		
 		groupDir = new Group(panelGeneral, SWT.NONE);
-		groupDir.setBounds(10, 10, 506, 194);
+		groupDir.setBounds(10, 10, 506, 169);
 		groupDir.setText("Settings");
 		groupDir.setLayout(null);
 
 		labelGameDir = new Label(groupDir, SWT.NONE);
-		labelGameDir.setBounds(10, 46, 138, 16);
+		labelGameDir.setBounds(10, 20, 138, 16);
 		labelGameDir.setText("Game directory:");
 		
 		textGameDir = new Text(groupDir, SWT.BORDER);
 		textGameDir.setEditable(true);
-		textGameDir.setBounds(10, 68, 393, 24);
+		textGameDir.setBounds(10, 42, 393, 24);
 		textGameDir.setToolTipText("Your game installation directory.");
 
 		buttonBrowseGame = new Button(groupDir, SWT.NONE);
-		buttonBrowseGame.setBounds(409, 67, 84, 26);
+		buttonBrowseGame.setBounds(409, 41, 84, 26);
 		buttonBrowseGame.setImage(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_folder.png"));
 		buttonBrowseGame.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		buttonBrowseGame.setText("Browse...");
 		
 		labelModDir = new Label(groupDir, SWT.NONE);
-		labelModDir.setBounds(10, 95, 138, 16);
+		labelModDir.setBounds(10, 69, 138, 16);
 		labelModDir.setText("Mod directory:");
 		
 		radioUseSame = new Button(groupDir, SWT.RADIO);
-		radioUseSame.setBounds(20, 116, 138, 16);
+		radioUseSame.setBounds(20, 90, 138, 16);
 		radioUseSame.setText("Use same as game");
 		
 		radioUseCustom = new Button(groupDir, SWT.RADIO);
-		radioUseCustom.setBounds(20, 138, 138, 16);
+		radioUseCustom.setBounds(20, 112, 138, 16);
 		radioUseCustom.setText("Use custom:");
 		
 		textModDir = new Text(groupDir, SWT.BORDER);
 		textModDir.setEditable(false);
-		textModDir.setBounds(10, 160, 393, 23);
+		textModDir.setBounds(10, 134, 393, 23);
 		textModDir.setEnabled(false);
 		textModDir.setToolTipText("The folder you wish to search for mods in. Selecting a larger directory will increase the load time!");
 
 		buttonBrowseMod = new Button(groupDir, SWT.NONE);
-		buttonBrowseMod.setBounds(409, 159, 84, 25);
+		buttonBrowseMod.setBounds(409, 133, 84, 25);
 		buttonBrowseMod.setImage(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_folder.png"));
 		buttonBrowseMod.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		buttonBrowseMod.setEnabled(false);
@@ -436,23 +453,6 @@ public class PreferencesWin32 extends Dialog {
 				
 				if(s != null) {
 					textModDir.setText(s);
-				}
-			}
-		});
-		
-		buttonUseSteam = new Button(groupDir, SWT.CHECK);
-		buttonUseSteam.setToolTipText("Enable this if you use the Steam copy of Amnesia. If you use retail, leave this unchecked.\r\nPS: If this is unchecked, you might get the \"Could not init Steam\" error for Steam copies.");
-		buttonUseSteam.setBounds(10, 22, 93, 18);
-		buttonUseSteam.setText("Use Steam");
-		buttonUseSteam.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				if(buttonUseSteam.getSelection()) {
-					radioGame.setEnabled(false);
-					radioLauncher.setEnabled(false);
-				} else {
-					radioGame.setEnabled(true);
-					radioLauncher.setEnabled(true);
 				}
 			}
 		});
@@ -497,7 +497,7 @@ public class PreferencesWin32 extends Dialog {
 		});
 
 		groupMisc = new Group(panelGeneral, SWT.NONE);
-		groupMisc.setBounds(10, 210, 320, 187);
+		groupMisc.setBounds(10, 185, 320, 181);
 		groupMisc.setText("Preferences");
 		groupMisc.setLayout(null);
 		
@@ -522,7 +522,7 @@ public class PreferencesWin32 extends Dialog {
 		});
 
 		groupIcon = new Group(panelGeneral, SWT.NONE);
-		groupIcon.setBounds(336, 210, 180, 187);
+		groupIcon.setBounds(336, 185, 180, 181);
 		groupIcon.setText("Icon size");
 		groupIcon.setLayout(null);
 		
@@ -570,34 +570,19 @@ public class PreferencesWin32 extends Dialog {
 		buttonMinimize.setToolTipText("If the Modloader should minimize the window after starting a mod.");
 		buttonMinimize.setBounds(13, 68, 202, 16);
 		buttonMinimize.setText("Minimize Modloader on mod start");
-		buttonApplyShader = new Button(groupMisc, SWT.CHECK);
-		buttonApplyShader.setToolTipText("If the Modloader should automatically install custom shaders when starting a mod. It will also uninstall the shaders when done.");
-		buttonApplyShader.setBounds(13, 90, 273, 16);
-		buttonApplyShader.setText("Apply custom shaders upon launch (if available)");
-		buttonApplyShader.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				if(buttonApplyShader.getSelection()) {
-					MessageBox m = new MessageBox(shell, SWT.SHEET | SWT.OK | SWT.ICON_WARNING);
-					m.setMessage("Disclaimer:\nThis is currently an experimental feature. This means that, although everything should work fine, I have not tested it enough to confirm this. It will modify some files in your Amnesia directory. It creates a backup, but I recommend you create one yourself in case of malfunction. The folder that is modified is named \"shaders\" and the backup name will be \"shaders_backup\". Other files are left alone.\n\nIf you find an issue, please report it to me so I can fix it, but keep in mind that you're on your own if things go wrong.");
-					m.setText("Beta Feature");
-					m.open();
-				}
-			}
-		});
 		
 		labelPrimary = new Label(groupMisc, SWT.NONE);
-		labelPrimary.setBounds(13, 112, 134, 15);
+		labelPrimary.setBounds(13, 101, 134, 15);
 		labelPrimary.setText("Primary launch option:");
 		radioLauncher = new Button(groupMisc, SWT.RADIO);
-		radioLauncher.setBounds(23, 133, 70, 16);
+		radioLauncher.setBounds(23, 122, 70, 16);
 		radioLauncher.setText("Launcher");
 		radioGame = new Button(groupMisc, SWT.RADIO);
-		radioGame.setBounds(23, 155, 85, 16);
+		radioGame.setBounds(23, 144, 85, 16);
 		radioGame.setText("Direct game");
 				
 		buttonOK = new Button(shell, SWT.NONE);
-		buttonOK.setBounds(378, 449, 80, 23);
+		buttonOK.setBounds(378, 417, 80, 23);
 		buttonOK.setText("Save");
 		shell.setDefaultButton(buttonOK);
 		buttonOK.addSelectionListener(new SelectionAdapter() {
@@ -608,7 +593,7 @@ public class PreferencesWin32 extends Dialog {
 		});
 		
 		buttonCancel = new Button(shell, SWT.NONE);
-		buttonCancel.setBounds(464, 449, 80, 23);
+		buttonCancel.setBounds(464, 417, 80, 23);
 		buttonCancel.setText("Cancel");
 		buttonCancel.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -655,7 +640,7 @@ public class PreferencesWin32 extends Dialog {
 			boolean shader = false;
 			boolean cache = false;
 			boolean useSteam = true;
-			boolean warnExec = true, warnShader = true, warnConfig = true, warnSteam = true, warnPatch = true;
+			boolean warnExec = true, warnShader = true, warnConfig = true, warnSteam = true;
 			int sliderVal = 2;
 			String modDir = "";
 			String gameDir = "";
@@ -673,13 +658,10 @@ public class PreferencesWin32 extends Dialog {
 			try {warnShader = Boolean.parseBoolean(p.getProperty("WarnShader"));} catch (Exception e) {Log.error("", e);}
 			try {warnConfig = Boolean.parseBoolean(p.getProperty("WarnConfig"));} catch (Exception e) {Log.error("", e);}
 			try {warnSteam = Boolean.parseBoolean(p.getProperty("WarnSteam"));} catch (Exception e) {Log.error("", e);}
-			try {warnPatch = Boolean.parseBoolean(p.getProperty("WarnPatch"));} catch (Exception e) {Log.error("", e);}
+			//try {warnPatch = Boolean.parseBoolean(p.getProperty("WarnPatch"));} catch (Exception e) {Log.error("", e);}
 			try {cache = Boolean.parseBoolean(p.getProperty("UseCache"));} catch (Exception e) {Log.error("", e);}
 			try {update = Boolean.parseBoolean(p.getProperty("CheckForUpdates"));} catch (Exception e) {Log.error("", e);}
-			
-//			boolean b[] = {warnExec, warnShader, warnConfig};
-//			loadWarns(b);
-			
+						
 			if(useSteam) {
 				radioGame.setEnabled(false);
 				radioLauncher.setEnabled(false);
@@ -719,7 +701,7 @@ public class PreferencesWin32 extends Dialog {
 			checkWarnSteam.setSelection(warnSteam);
 			checkWarnCustomExec.setSelection(warnExec);
 			checkWarnShaders.setSelection(warnShader);
-			checkWarnPatch.setSelection(warnPatch);
+			//checkWarnPatch.setSelection(warnPatch);
 			checkUpdate.setSelection(update);
 			
 			textGameDir.setText(gameDir);
@@ -769,11 +751,11 @@ public class PreferencesWin32 extends Dialog {
 			p.setProperty("WarnShader", ""+checkWarnShaders.getSelection());
 			p.setProperty("WarnConfig", ""+checkWarnConfig.getSelection());
 			p.setProperty("WarnSteam", ""+checkWarnSteam.getSelection());
-			p.setProperty("WarnPatch", ""+checkWarnPatch.getSelection());
+			//p.setProperty("WarnPatch", ""+checkWarnPatch.getSelection());
 			
 			ConfigManager.writeConfig(p, Engine.prefPath);
 
-			PatchConfig.setWarnPatch(checkWarnPatch.getSelection());
+			//PatchConfig.setWarnPatch(checkWarnPatch.getSelection());
 
 			Engine.setUseSteam(buttonUseSteam.getSelection(), MainFrameWin32.tableMods, MainFrameWin32.menuList, MainFrameWin32.menuList2);
 			Engine.setModDirectory(modDir);

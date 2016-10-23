@@ -4,6 +4,7 @@
 	<classpathentry kind="src" path="lib"/>
 	<classpathentry kind="lib" path="lib/SWTSplitButton-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/swt-win32.jar"/>
+	<classpathentry kind="lib" path="lib/mslinks.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

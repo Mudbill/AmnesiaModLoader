@@ -44,7 +44,7 @@ public class MainFrameWin32 {
 	private static TableColumn columnMods;
 	private static Label labelShader, labelShaderVal, sep, labelModsFound;
 	public static Label labelModAmount, labelPath;
-	public static MenuItem menuItemLauncher, menuItemGame, menuItemGame2;
+	public static MenuItem menuItemLauncher, menuItemGame, menuItemGame2, menuItemShortcut;
 	public static Menu menuList, menuList2;
 	public static ProgressBar progressBar;
 		
@@ -350,6 +350,16 @@ public class MainFrameWin32 {
 			}
 		});
 		
+		menuItemShortcut = new MenuItem(menuList, SWT.NONE);
+		menuItemShortcut.setImage(SWTResourceManager.getImage(MainFrameWin32.class, "/resources/icon_shortcut.png"));
+		menuItemShortcut.setText("Create shortcut");
+		menuItemShortcut.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				Engine.createShortcut();
+			}
+		});
+				
 		progressBar = new ProgressBar(shell, SWT.SMOOTH | SWT.INDETERMINATE);
 		progressBar.setBounds(126, 12, 561, 21);
 		progressBar.setVisible(false);
@@ -394,6 +404,16 @@ public class MainFrameWin32 {
 			public void widgetSelected(SelectionEvent arg0) {
 				Log.info("Direct game selected.");
 				Engine.launchMod(shell, CurrentOS.getGameExe());
+			}
+		});
+		
+		MenuItem shortcut = new MenuItem(menu, SWT.PUSH);
+		shortcut.setText("Create shortcut");
+		shortcut.setImage(SWTResourceManager.getImage(MainFrameWin32.class, "/resources/icon_shortcut.png"));
+		shortcut.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				Engine.createShortcut();
 			}
 		});
 	}

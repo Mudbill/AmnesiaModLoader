@@ -1,4 +1,12 @@
+October 23rd 2016 - version 1.6.5 - Windows
+
+- Added option to create a Windows shortcut to a mod to start it even quicker, in case you launch it a lot.
+- Removed ability to patch config (since FG updated Amnesia to fix this).
+- Moved "Use Steam" to advanced page since it's no longer important (also fixed by FG)
+- Moved "Apply shaders" to advanced page since it doesn't need to be in your face.
+
 October 10th 2016 - version 1.6.4 - Windows
+
 - Fixed issue with update crashing the app while offline.
 - Added more multi-threading so that the app works a bit smoother.
 - Greatly improved scanning speed.
@@ -16,3 +24,5 @@ October 1st 2016 - version 1.6.3 - Windows
   - I might add some auto-update installation in the future, but for now it only checks and prompts.
 - Organized a lot of the internal code to hopefully be easier to update/manage in the future.
 - Miscellaneous tweaks and bugfixes.
+
+==Older changelogs can be found on the forum thread.==

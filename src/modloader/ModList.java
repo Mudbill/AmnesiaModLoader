@@ -94,34 +94,6 @@ public class ModList {
 		return ModList.modsFoundTotal;
 	}
 
-	public String getModTitle() {
-		return ModList.modTitle;
-	}
-	
-	public String getModIcon() {
-		return ModList.modIcon;
-	}
-	
-	public String getModAuthor() {
-		return ModList.modAuthor;
-	}
-	
-	public String getModDesc() {
-		return ModList.modDesc;
-	}
-	
-	public String getModHasCustomShaders() {
-		return ModList.modShader;
-	}
-	
-	public String getModExecName() {
-		return ModList.modExecName;
-	}
-	
-	public String getModIgnoreShaders() {
-		return ModList.modIgnoreShaders;
-	}
-	
 	public String getModMinCompatibility(int idx) {
 		String comp = infoMinCompatibility.get(idx);
 		return comp;
@@ -329,7 +301,7 @@ public class ModList {
 					}
 				});
 			
-			Log.info("Adding mod to list: " + this.getModTitle());
+			Log.info("Adding mod to list: " + modTitle);
 			
 		} catch (IOException e) {
 			new Error(null);
