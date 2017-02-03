@@ -57,7 +57,7 @@ public class Update {
 	 */
 	public static boolean compareVersions(String newVersion) {
 		String[] nv = newVersion.split("[.]");
-		String[] current = Engine.appVersion.split("[.]");
+		String[] current = Engine.APP_VERSION.split("[.]");
 				
 		for(int i = 0; i < nv.length; i++) {
 			try {
@@ -82,12 +82,12 @@ public class Update {
 			public void run() {
 				MessageBox m = new MessageBox(Engine.getShell(), SWT.ICON_INFORMATION | SWT.YES | SWT.NO);
 				m.setText("Update available");
-				m.setMessage("There's an update available for download. Would you like to visit the download page?\n\nCurrent version: " + Engine.appVersion + "\nNew version: " + onlineVersion);
+				m.setMessage("There's an update available for download. Would you like to visit the download page?\n\nCurrent version: " + Engine.APP_VERSION + "\nNew version: " + onlineVersion);
 				int i = m.open();
 				if(i == SWT.YES) {
 					try {
-						Log.info("Opening website: " + Engine.urlForum);
-						Common.openWebpage(new URL(Engine.urlForum));
+						Log.info("Opening website: " + Engine.URL_FORUM);
+						Common.openWebpage(new URL(Engine.URL_FORUM));
 						Engine.getShell().close();
 					} catch (MalformedURLException e) {
 						Log.error("", e);

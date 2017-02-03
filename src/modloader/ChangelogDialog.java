@@ -39,6 +39,9 @@ public class ChangelogDialog extends Dialog {
 	 */
 	public Object open() {
 		createContents();
+		Engine.scaleControl(shell);
+		Engine.scaleToDPI(shell);
+		Common.center(shell);
 		shell.open();
 		shell.layout();
 		Display display = getParent().getDisplay();

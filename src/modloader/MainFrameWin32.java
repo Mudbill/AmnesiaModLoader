@@ -80,6 +80,10 @@ public class MainFrameWin32 {
 	 */
 	public void open() {
 		createContents();
+		Engine.scaleControl(shell);
+		Engine.scaleToDPI(shell);
+		Common.center(shell);
+		shell.setBackgroundImage(Common.scale(SWTResourceManager.getImage(MainFrameWin32.class, "/resources/modloader_bg.png"), shell.getSize().x, shell.getSize().y));
 		shell.open();
 		shell.layout();
 		while (!shell.isDisposed()) {
@@ -95,9 +99,8 @@ public class MainFrameWin32 {
 	protected void createContents() {
 		shell = new Shell(display, SWT.CLOSE | SWT.MIN | SWT.TITLE);
 		shell.setImage(SWTResourceManager.getImage(MainFrameWin32.class, "/resources/icon_application.png"));
-		shell.setBackgroundImage(SWTResourceManager.getImage(MainFrameWin32.class, "/resources/modloader_bg.png"));
 		shell.setSize(703, 578);
-		shell.setText(Engine.appName);
+		shell.setText(Engine.APP_NAME);
 		shell.addListener(SWT.Close, new Listener() {
 			public void handleEvent(Event event) {
 				event.doit = Engine.shutDown();
@@ -305,7 +308,7 @@ public class MainFrameWin32 {
 			}
 		});
 		columnMods = new TableColumn(tableMods, SWT.NONE);
-		columnMods.setWidth(307);
+		columnMods.setWidth((int) (307 * Engine.DPI_SCALE));
 		columnMods.setText("Mods");
 		labelModsFound = new Label(leftPanel, SWT.NONE);
 		labelModsFound.setBounds(10, 278, 151, 13);

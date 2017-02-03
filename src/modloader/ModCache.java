@@ -157,16 +157,16 @@ public class ModCache {
 			{
 				//scale the image to specified size.
 				Image image = new Image(Display.getDefault(), iconFile.toString());
-				modItem.setImage(Common.scale(image, Engine.getIconSize()));
+				modItem.setImage(Common.scale(image, Engine.getIconSize(), Engine.getIconSize()));
 				
 			} else {
 				Log.warn("Icon file not found. Using default.");
-				modItem.setImage(Common.scale(SWTResourceManager.getImage(Engine.class, ModList.defIcon), Engine.getIconSize()));
+				modItem.setImage(Common.scale(SWTResourceManager.getImage(Engine.class, ModList.defIcon), Engine.getIconSize(), Engine.getIconSize()));
 			}
 			
 		} catch(Exception e) {				
 			Log.error("\tFailed adding icon: " + icon, e);
-			modItem.setImage(Common.scale(SWTResourceManager.getImage(Engine.class, ModList.defIcon), Engine.getIconSize()));
+			modItem.setImage(Common.scale(SWTResourceManager.getImage(Engine.class, ModList.defIcon), Engine.getIconSize(), Engine.getIconSize()));
 		}
 				
 		ModList.infoTitle.add(title);

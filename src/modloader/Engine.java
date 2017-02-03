@@ -11,6 +11,8 @@ import mslinks.ShellLink;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -24,14 +26,19 @@ import org.eclipse.swt.widgets.Text;
 
 public class Engine {
 	
-	public static final String appName = "Amnesia Modloader";
-	public static final String appVersion = "1.6.5";
-	public static final String cfgName = "main_init.cfg";
-	public static final String urlWeb = "http://buttology.net/downloads/amnesia-modloader/";
-	public static final String urlForum = "https://www.frictionalgames.com/forum/thread-25806.html";
-	public static final String urlYoutube = "https://www.youtube.com/MrMudbill";
-	public static final String urlTwitter = "https://www.twitter.com/Mudbill";	
-
+	public static final int DPI = Display.getDefault().getDPI().x;
+	public static final float DPI_DEFAULT = 96.0f;
+	public static final float DPI_SCALE = DPI / DPI_DEFAULT;
+	
+	public static final String APP_NAME = "Amnesia Modloader";
+	public static final String APP_VERSION = "1.6.6";
+	public static final String CFG_NAME = "main_init.cfg";
+	public static final String URL_WEB = "http://buttology.net/downloads/amnesia-modloader/";
+	public static final String URL_FORUM = "https://www.frictionalgames.com/forum/thread-25806.html";
+	public static final String URL_YOUTUBE = "https://www.youtube.com/MrMudbill";
+	public static final String URL_TWITTER = "https://www.twitter.com/Mudbill";	
+	public static final String ROOT_CFG_VERSION = "2.0";
+	
 	public static String prefPath;
 	public static String portPath;
 
@@ -48,6 +55,28 @@ public class Engine {
 	public static boolean useCache = false;
 	public static boolean abortRefresh = false;
 	public static boolean useSteam = false;
+	
+	public static void scaleToDPI(Composite composite) {
+		for(Control control : composite.getChildren()) {
+			if(control instanceof Composite) {
+				scaleToDPI((Composite) control);
+			}
+			scaleControl(control);
+		}
+	}
+	
+	public static void scaleControl(Control control) {
+		int x = control.getLocation().x;
+		int y = control.getLocation().y;
+		int w = control.getSize().x;
+		int h = control.getSize().y;
+		int x2 = (int) (x * DPI_SCALE);
+		int y2 = (int) (y * DPI_SCALE);
+		int w2 = (int) (w * DPI_SCALE);
+		int h2 = (int) (h * DPI_SCALE);
+		control.setBounds(x2, y2, w2, h2);
+		//System.out.println("Rebinding control " + control.getClass().toString() + "\nOld: " + x + ", " + y + ", " + w + ", " + h + "\nNew: " + x2 + ", " + y2 + ", " + w2 + ", " + h2);
+	}
 	
 	public static void openFrame() {
 		if(CurrentOS.getSystem() == "Windows") {
@@ -150,7 +179,12 @@ public class Engine {
 
 	public static String getVersion()
 	{
-		return Engine.appVersion;
+		return Engine.APP_VERSION;
+	}
+	
+	public static String getRootCFGVersion()
+	{
+		return Engine.ROOT_CFG_VERSION;
 	}
 	
 	public static String getModDirectory()
@@ -216,7 +250,7 @@ public class Engine {
 	{
 		modSelected = false;
 		try {
-			FindFile ff = new FindFile(display, progressBar, new File(modDirectory), cfgName);
+			FindFile ff = new FindFile(display, progressBar, new File(modDirectory), CFG_NAME);
 			ff.start();
 
 			if(display.isDisposed()) return;

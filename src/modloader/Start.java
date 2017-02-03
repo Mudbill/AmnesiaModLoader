@@ -21,6 +21,7 @@ public class Start {
 	public static void main(String[] args) {
 		try {
 			Log.info("Starting Amnesia Modloader version " + Engine.getVersion());
+			Log.info("DPI = " + Engine.DPI + ", DPI scale = " + Engine.DPI_SCALE);
 			
 			new CurrentOS().setOSValues();
 						
@@ -116,7 +117,7 @@ public class Start {
 		} catch (Exception e) {
 			Log.error("", e);
 		} finally {			
-			Log.printLog();				
+			Log.printLog();			
 		}
 	}
 	
@@ -127,7 +128,7 @@ public class Start {
 			Log.info("\tRoot config found: " + rootCfg.getPath());
 			Properties rootConfig = ConfigManager.loadConfig(rootCfg.getPath());
 			try {
-				if(rootConfig.getProperty("CfgVersion").equals(Engine.getVersion())) {
+				if(rootConfig.getProperty("CfgVersion").equals(Engine.getRootCFGVersion())) {
 					Log.info("\tRoot config version is up to date. Version: " + rootConfig.getProperty("CfgVersion"));
 					return;
 				} else {

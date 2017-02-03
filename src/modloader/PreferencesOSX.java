@@ -428,8 +428,8 @@ public class PreferencesOSX extends Dialog {
 		iconPreview = new Label(groupIcon, SWT.NONE);
 		iconPreview.setBounds(61, 25, 64, 64);
 		if(ConfigManager.loadConfig(prefPath) != null) {
-			iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesOSX.class, "/resources/icon_default.png"), MainFrameOSX.getIconSize()));			
-		} else iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesOSX.class, "/resources/icon_default.png"), 48));
+			iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesOSX.class, "/resources/icon_default.png"), Engine.getIconSize(), Engine.getIconSize()));			
+		} else iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesOSX.class, "/resources/icon_default.png"), 48, 48));
 
 		labelSize = new Label(groupIcon, SWT.CENTER);
 		labelSize.setBounds(13, 95, 42, 21);
@@ -446,19 +446,19 @@ public class PreferencesOSX extends Dialog {
 			public void widgetSelected(SelectionEvent arg0) {
 				if(slider.getSelection() == 2) {
 					labelSize.setText("64x");
-					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesOSX.class, "/resources/icon_default.png"), 64));
+					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesOSX.class, "/resources/icon_default.png"), 64, 64));
 				}
 				if(slider.getSelection() == 1) {
 					labelSize.setText("48x");
-					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesOSX.class, "/resources/icon_default.png"), 48));
+					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesOSX.class, "/resources/icon_default.png"), 48, 48));
 				}
 				if(slider.getSelection() == 0) {
 					labelSize.setText("32x");
-					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesOSX.class, "/resources/icon_default.png"), 32));
+					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesOSX.class, "/resources/icon_default.png"), 32, 32));
 				}
 				if(slider.getSelection() == 3) {
 					labelSize.setText("16x");
-					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesOSX.class, "/resources/icon_default.png"), 16));
+					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesOSX.class, "/resources/icon_default.png"), 16, 16));
 				}
 			}
 		});

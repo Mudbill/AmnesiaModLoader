@@ -31,12 +31,12 @@ public class Common {
 	 * @param size
 	 * @return
 	 */
-	public static Image scale(Image image, int size) {
-		Image newImage = new Image(image.getDevice(), size, size);
+	public static Image scale(Image image, int x, int y) {
+		Image newImage = new Image(image.getDevice(), x, y);
 		GC gc = new GC(newImage);
 		gc.setAdvanced(true);
 		gc.setAntialias(SWT.ON);
-		gc.drawImage(image, 0, 0, image.getBounds().width, image.getBounds().height, 0, 0, size, size);
+		gc.drawImage(image, 0, 0, image.getBounds().width, image.getBounds().height, 0, 0, x, y);
 		gc.dispose();
 		return newImage;
 	}

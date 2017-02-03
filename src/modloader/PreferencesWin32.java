@@ -6,6 +6,9 @@ import java.net.URL;
 import java.util.Properties;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -24,9 +27,6 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 
 public class PreferencesWin32 extends Dialog {
 
@@ -45,7 +45,7 @@ public class PreferencesWin32 extends Dialog {
 	private Button checkWarnConfig, checkWarnSteam, checkWarnCustomExec, checkWarnShaders, checkUpdate;
 	private Button buttonClearSettings;
 	private Button buttonUpdate;
-	
+		
 	/**
 	 * Create the dialog.
 	 * @param parent
@@ -61,6 +61,9 @@ public class PreferencesWin32 extends Dialog {
 	 */
 	public Object open() {
 		createContents();
+		Engine.scaleControl(shell);
+		Engine.scaleToDPI(shell);
+		Common.center(shell);
 		shell.open();
 		shell.layout();
 		Display display = getParent().getDisplay();
@@ -82,19 +85,18 @@ public class PreferencesWin32 extends Dialog {
 		} catch (Exception e1) {
 			Log.error("", e1);
 		}
-		shell.setSize(560, 478);
 		shell.setText("Options");
 		shell.setLayout(null);
-		if(!Engine.getFrameInit())Common.center(shell);
 		
 		tabFolder = new TabFolder(shell, SWT.NONE);
 		tabFolder.setBounds(10, 10, 534, 401);
 		
 		panelGeneral = new Composite(tabFolder, SWT.NONE);
-		panelGeneral.setLayout(null);
 		
 		panelAbout = new Composite(tabFolder, SWT.NONE);
 		panelAbout.setLayout(null);
+		Engine.scaleControl(panelAbout);
+		Engine.scaleToDPI(panelAbout);
 
 		tabGeneral = new TabItem(tabFolder, SWT.NONE);
 		tabGeneral.setText("General");
@@ -297,7 +299,7 @@ public class PreferencesWin32 extends Dialog {
 		
 		labelName = new Label(panelAbout, SWT.NONE);
 		labelName.setBounds(10, 10, 172, 17);
-		labelName.setText(Engine.appName);
+		labelName.setText(Engine.APP_NAME);
 		
 		labelVer = new Label(panelAbout, SWT.NONE);
 		labelVer.setBounds(20, 33, 152, 13);
@@ -311,14 +313,14 @@ public class PreferencesWin32 extends Dialog {
 		
 		buttonWeb = new Button(panelAbout, SWT.NONE);
 		buttonWeb.setBounds(10, 281, 250, 55);
-		buttonWeb.setToolTipText(Engine.urlWeb);
+		buttonWeb.setToolTipText(Engine.URL_WEB);
 		buttonWeb.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		buttonWeb.setText("View online page");
 		buttonWeb.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				try {
-					Common.openWebpage(new URL(Engine.urlWeb));
+					Common.openWebpage(new URL(Engine.URL_WEB));
 				} catch (MalformedURLException e) {
 					Log.error("MalformedURLException", e);
 				}
@@ -329,12 +331,12 @@ public class PreferencesWin32 extends Dialog {
 		buttonForum.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		buttonForum.setBounds(266, 281, 250, 55);
 		buttonForum.setText("View forum thread");
-		buttonForum.setToolTipText(Engine.urlForum);
+		buttonForum.setToolTipText(Engine.URL_FORUM);
 		buttonForum.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				try {
-					Common.openWebpage(new URL(Engine.urlForum));
+					Common.openWebpage(new URL(Engine.URL_FORUM));
 				} catch (MalformedURLException e) {
 					Log.error("MalformedURLException", e);
 				}
@@ -345,12 +347,12 @@ public class PreferencesWin32 extends Dialog {
 		buttonTwitter.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		buttonTwitter.setImage(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_twitter.png"));
 		buttonTwitter.setBounds(458, 339, 26, 26);
-		buttonTwitter.setToolTipText(Engine.urlTwitter);
+		buttonTwitter.setToolTipText(Engine.URL_TWITTER);
 		buttonTwitter.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				try {
-					Common.openWebpage(new URL(Engine.urlTwitter));
+					Common.openWebpage(new URL(Engine.URL_TWITTER));
 				} catch (MalformedURLException e) {
 					Log.error("MalformedURLException", e);
 				}
@@ -361,12 +363,12 @@ public class PreferencesWin32 extends Dialog {
 		buttonYoutube.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		buttonYoutube.setImage(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_youtube.png"));
 		buttonYoutube.setBounds(490, 339, 26, 26);
-		buttonYoutube.setToolTipText(Engine.urlYoutube);
+		buttonYoutube.setToolTipText(Engine.URL_YOUTUBE);
 		buttonYoutube.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				try {
-					Common.openWebpage(new URL(Engine.urlYoutube));
+					Common.openWebpage(new URL(Engine.URL_YOUTUBE));
 				} catch (MalformedURLException e) {
 					Log.error("MalformedURLException", e);
 				}
@@ -390,12 +392,13 @@ public class PreferencesWin32 extends Dialog {
 		
 		ShellAboutWin32 shellAbout = new ShellAboutWin32(scrolledComposite, SWT.NONE);
 		scrolledComposite.setContent(shellAbout);
-		scrolledComposite.setMinSize(shellAbout.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		scrolledComposite.setMinHeight((int) (shellAbout.computeSize(SWT.DEFAULT, SWT.DEFAULT).y * Engine.DPI_SCALE));
 		shellAbout.addListener(SWT.Activate, new Listener() {
 		    public void handleEvent(Event event) {
 		        scrolledComposite.setFocus();
 		    }
 		});
+		panelGeneral.setLayout(null);
 		
 		groupDir = new Group(panelGeneral, SWT.NONE);
 		groupDir.setBounds(10, 10, 506, 169);
@@ -403,40 +406,40 @@ public class PreferencesWin32 extends Dialog {
 		groupDir.setLayout(null);
 
 		labelGameDir = new Label(groupDir, SWT.NONE);
-		labelGameDir.setBounds(10, 20, 138, 16);
+		labelGameDir.setBounds(10, 22, 138, 16);
 		labelGameDir.setText("Game directory:");
 		
 		textGameDir = new Text(groupDir, SWT.BORDER);
+		textGameDir.setBounds(10, 44, 393, 24);
 		textGameDir.setEditable(true);
-		textGameDir.setBounds(10, 42, 393, 24);
 		textGameDir.setToolTipText("Your game installation directory.");
 
 		buttonBrowseGame = new Button(groupDir, SWT.NONE);
-		buttonBrowseGame.setBounds(409, 41, 84, 26);
+		buttonBrowseGame.setBounds(409, 43, 84, 26);
 		buttonBrowseGame.setImage(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_folder.png"));
 		buttonBrowseGame.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		buttonBrowseGame.setText("Browse...");
 		
 		labelModDir = new Label(groupDir, SWT.NONE);
-		labelModDir.setBounds(10, 69, 138, 16);
+		labelModDir.setBounds(10, 71, 138, 16);
 		labelModDir.setText("Mod directory:");
 		
 		radioUseSame = new Button(groupDir, SWT.RADIO);
-		radioUseSame.setBounds(20, 90, 138, 16);
+		radioUseSame.setBounds(20, 92, 138, 19);
 		radioUseSame.setText("Use same as game");
 		
 		radioUseCustom = new Button(groupDir, SWT.RADIO);
-		radioUseCustom.setBounds(20, 112, 138, 16);
+		radioUseCustom.setBounds(20, 114, 138, 19);
 		radioUseCustom.setText("Use custom:");
 		
 		textModDir = new Text(groupDir, SWT.BORDER);
+		textModDir.setBounds(10, 136, 393, 23);
 		textModDir.setEditable(false);
-		textModDir.setBounds(10, 134, 393, 23);
 		textModDir.setEnabled(false);
 		textModDir.setToolTipText("The folder you wish to search for mods in. Selecting a larger directory will increase the load time!");
 
 		buttonBrowseMod = new Button(groupDir, SWT.NONE);
-		buttonBrowseMod.setBounds(409, 133, 84, 25);
+		buttonBrowseMod.setBounds(409, 135, 84, 25);
 		buttonBrowseMod.setImage(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_folder.png"));
 		buttonBrowseMod.setBackground(SWTResourceManager.getColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
 		buttonBrowseMod.setEnabled(false);
@@ -502,14 +505,14 @@ public class PreferencesWin32 extends Dialog {
 		groupMisc.setLayout(null);
 		
 		buttonCache = new Button(groupMisc, SWT.CHECK);
+		buttonCache.setBounds(13, 26, 162, 19);
 		buttonCache.setSelection(true);
 		buttonCache.setToolTipText("If the Modloader should save a cache of the last list shown, \r\nand load it upon next start. This will immediately show the mods in the list, \r\nbut the information might be out-of-date if you've made changes to your directory.");
-		buttonCache.setBounds(13, 24, 162, 16);
 		buttonCache.setText("Use cached list on startup");
 		
 		buttonRefreshBoot = new Button(groupMisc, SWT.CHECK);
+		buttonRefreshBoot.setBounds(13, 48, 137, 19);
 		buttonRefreshBoot.setToolTipText("If the Modloader should automatically refresh the mod list when starting. Startup will be slower.");
-		buttonRefreshBoot.setBounds(13, 46, 134, 16);
 		buttonRefreshBoot.setText("Update list on startup");
 		buttonRefreshBoot.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -527,17 +530,17 @@ public class PreferencesWin32 extends Dialog {
 		groupIcon.setLayout(null);
 		
 		iconPreview = new Label(groupIcon, SWT.NONE);
-		iconPreview.setBounds(106, 25, 64, 64);
+		iconPreview.setBounds(106, 27, 64, 64);
 		if(ConfigManager.loadConfig(Engine.prefPath) != null) {
-			iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_default.png"), Engine.getIconSize()));
-		} else iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_default.png"), 48));
+			iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_default.png"), Engine.getIconSize(), Engine.getIconSize()));
+		} else iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_default.png"), 48, 48));
 
 		labelSize = new Label(groupIcon, SWT.CENTER);
-		labelSize.setBounds(13, 95, 42, 21);
+		labelSize.setBounds(13, 97, 42, 21);
 		labelSize.setText("48x");
 		
 		slider = new Scale(groupIcon, SWT.VERTICAL);
-		slider.setBounds(13, 25, 42, 64);
+		slider.setBounds(13, 27, 48, 64);
 		slider.setToolTipText("Drag to select the size you want icons to show up with.");
 		slider.setPageIncrement(1);
 		slider.setMaximum(2);
@@ -549,40 +552,40 @@ public class PreferencesWin32 extends Dialog {
 				
 				if(slider.getSelection() == 0) {
 					labelSize.setText("64x");
-					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_default.png"), 64));
+					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_default.png"), 64, 64));
 				}
 				if(slider.getSelection() == 1) {
 					labelSize.setText("48x");
-					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_default.png"), 48));
+					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_default.png"), 48, 48));
 				}
 				if(slider.getSelection() == 2) {
 					labelSize.setText("32x");
-					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_default.png"), 32));
+					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_default.png"), 32, 32));
 				}
 				if(slider.getSelection() == 3) {
 					labelSize.setText("16x");
-					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_default.png"), 16));
+					iconPreview.setImage(Common.scale(SWTResourceManager.getImage(PreferencesWin32.class, "/resources/icon_default.png"), 16, 16));
 				}
 			}
 		});
 		
 		buttonMinimize = new Button(groupMisc, SWT.CHECK);
+		buttonMinimize.setBounds(13, 70, 202, 19);
 		buttonMinimize.setToolTipText("If the Modloader should minimize the window after starting a mod.");
-		buttonMinimize.setBounds(13, 68, 202, 16);
 		buttonMinimize.setText("Minimize Modloader on mod start");
 		
 		labelPrimary = new Label(groupMisc, SWT.NONE);
-		labelPrimary.setBounds(13, 101, 134, 15);
+		labelPrimary.setBounds(13, 103, 134, 15);
 		labelPrimary.setText("Primary launch option:");
 		radioLauncher = new Button(groupMisc, SWT.RADIO);
-		radioLauncher.setBounds(23, 122, 70, 16);
+		radioLauncher.setBounds(23, 124, 70, 19);
 		radioLauncher.setText("Launcher");
 		radioGame = new Button(groupMisc, SWT.RADIO);
-		radioGame.setBounds(23, 144, 85, 16);
+		radioGame.setBounds(23, 146, 85, 19);
 		radioGame.setText("Direct game");
 				
 		buttonOK = new Button(shell, SWT.NONE);
-		buttonOK.setBounds(378, 417, 80, 23);
+		buttonOK.setBounds(378, 417, 80, 25);
 		buttonOK.setText("Save");
 		shell.setDefaultButton(buttonOK);
 		buttonOK.addSelectionListener(new SelectionAdapter() {
@@ -593,7 +596,7 @@ public class PreferencesWin32 extends Dialog {
 		});
 		
 		buttonCancel = new Button(shell, SWT.NONE);
-		buttonCancel.setBounds(464, 417, 80, 23);
+		buttonCancel.setBounds(464, 417, 80, 25);
 		buttonCancel.setText("Cancel");
 		buttonCancel.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -602,6 +605,13 @@ public class PreferencesWin32 extends Dialog {
 				shell.close();
 			}
 		});
+		shell.setSize(560, 478);
+		//width = tabFolder.getSize().x + (tabFolder.getLocation().x*2);
+		//height = tabFolder.getSize().y + (tabFolder.getLocation().y*2) + buttonOK.getSize().y;
+		//Log.info("Size: " + width + ", " + height); //534, 401
+		//Log.info("");
+		//shell.setSize(width, height);
+		if(!Engine.getFrameInit())Common.center(shell);
 		loadData();
 	}
 	

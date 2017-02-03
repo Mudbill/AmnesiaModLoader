@@ -273,10 +273,10 @@ public class ModList {
 						if(iconFile.exists() && iconFile.isFile()) {
 							Log.info("Applying icon: " + iconFile.toString());
 							Image image = new Image(Display.getDefault(), iconFile.toString());
-							MainFrameOSX.modItem.setImage(Common.scale(image, Engine.getIconSize()));						
+							MainFrameOSX.modItem.setImage(Common.scale(image, Engine.getIconSize(), Engine.getIconSize()));						
 						} else {
 							Log.warn("Icon file not found. Using default.");
-							MainFrameOSX.modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrameOSX.class, defIcon), Engine.getIconSize()));
+							MainFrameOSX.modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrameOSX.class, defIcon), Engine.getIconSize(), Engine.getIconSize()));
 						}
 						listDataArr.add(MainFrameOSX.modItem);
 						MainFrameOSX.labelModAmount.setText(""+modsFoundTotal);
@@ -291,10 +291,10 @@ public class ModList {
 						if(iconFile.exists() && iconFile.isFile()) {
 							Log.info("Applying icon: " + iconFile.toString());
 							Image image = new Image(Display.getDefault(), iconFile.toString());
-							MainFrameWin32.modItem.setImage(Common.scale(image, Engine.getIconSize()));						
+							MainFrameWin32.modItem.setImage(Common.scale(image, Engine.getIconSize(), Engine.getIconSize()));						
 						} else {
 							Log.warn("Icon file not found. Using default.");
-							MainFrameWin32.modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrameWin32.class, defIcon), Engine.getIconSize()));
+							MainFrameWin32.modItem.setImage(Common.scale(SWTResourceManager.getImage(MainFrameWin32.class, defIcon), Engine.getIconSize(), Engine.getIconSize()));
 						}
 						listDataArr.add(MainFrameWin32.modItem);
 						MainFrameWin32.labelModAmount.setText(""+modsFoundTotal);
