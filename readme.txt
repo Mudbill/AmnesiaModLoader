@@ -2,6 +2,8 @@ Amnesia Modloader v1.6.4
 
 ================
 
+Note (26/1/29): This is a legacy repository. For AmnesiaModLoader2, see https://github.com/Mudbill/AmnesiaModLoader2
+
 Modloader Java application for Amnesia - The Dark Descent.
 
 This is the entire Eclipse project. Import it using File > Import in Eclipse. Start.java will boot the program.
