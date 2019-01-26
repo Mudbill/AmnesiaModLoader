@@ -2,7 +2,7 @@ Amnesia Modloader v1.6.4
 
 ================
 
-Note (26/1/29): This is a legacy repository. For AmnesiaModLoader2, see https://github.com/Mudbill/AmnesiaModLoader2
+Note (26/1/19): This is a legacy repository. For AmnesiaModLoader2, see https://github.com/Mudbill/AmnesiaModLoader2
 
 Modloader Java application for Amnesia - The Dark Descent.
 
